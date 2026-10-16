@@ -1,5 +1,5 @@
 // Workday search-and-pick boxes (Skills, Field of Study): search, select only exact matches, report everything else honestly.
-import { decideSkill, relatedSkill, skillKey } from '../../domain/skills';
+import { chipIsSkill, decideSkill, relatedSkill, skillKey } from '../../domain/skills';
 import type { SkillOutcome, SkillRequestItem } from '../../platform/adapter';
 import { nameKey } from '../../domain/text';
 import { clickOption, listFor, optionsIn, pressKey, setNativeValue, sleep, snapshotLists, waitFor, type WriteResult } from './controls';
@@ -43,7 +43,8 @@ export async function searchSkills(input: HTMLInputElement, items: readonly Skil
     if (stuck >= 2) { out.push({ name: item.name, status: 'full' }); continue; }
     const count = chips().length;
     const wanted = item.option ? [item.option] : item.spellings;
-    const already = chips().find((c) => wanted.some((w) => skillKey(w) === skillKey(c)));
+    // Includes chips the site pre-filled as "(Suggested)", so a skill is never added twice (live 2026-10-16).
+    const already = chips().find((c) => wanted.some((w) => chipIsSkill(c, w)));
     if (already) { out.push({ name: item.name, status: 'alreadySelected', option: already }); continue; }
 
     const suggestions = new Set<string>();

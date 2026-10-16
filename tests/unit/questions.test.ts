@@ -56,6 +56,15 @@ describe('sensitive answers', () => {
     expect(sensitiveTopic('Have you ever worked for the U.S. Government (including U.S. military active duty)?')).toBeUndefined();
   });
 
+  it('recognizes "18 or older" questions as their own sensitive topic (live Workday 2026-10-16)', () => {
+    const live = 'Are you 18 years or older? If you are under 18, hire is subject to verification that you are of minimum and legal age';
+    expect(sensitiveTopic(live)).toBe('over18');
+    expect(sensitiveTopic('Are you at least 18 years of age?')).toBe('over18');
+    expect(sensitiveTopic('Are you 18 or older?')).toBe('over18');
+    expect(sensitiveTopic('How many of your 180 credits are complete?')).toBeUndefined();
+    expect(sensitiveChoice(live, 'demographic', ['Yes', 'No'], [{ topic: 'over18', answer: 'Yes' }])).toEqual({ topic: 'over18', option: 'Yes' });
+  });
+
   describe('topic from the choices (CC-305, live QA 2026-10-12)', () => {
     const cc305 = ['Yes, I have a disability, or have had one in the past', 'No, I do not have a disability and have not had one in the past', 'I do not want to answer'];
     const no = 'No, I do not have a disability and have not had one in the past';

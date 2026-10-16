@@ -2,7 +2,7 @@
 
 **Session setup (verified 2026-10-10):** model `claude-opus-5-5`, effort `medium`; plugins `ponytail@ponytail` 5.1.0 (level full), `agent-skills@addy-agent-skills` 0.6.12.
 **Toolchain:** Node 22.23.3, npm 10.9.9; WXT 0.21.4 (Vite 8.3), React 19.3, Tailwind 4.3, Zod 4.6, Vitest 5.0, Playwright 1.64 (Chromium 156), ESLint 10.12, TypeScript 6.0.3 (TS 7.0 is current, but typescript-eslint 8.71 requires `<6.1`).
-**Branch:** `feat/workday-v1`, pushed to private repo the project repo after each phase (user decision 2026-10-10).
+**Branch:** `feat/workday-v1`, pushed to the private GitHub repo after each phase (user decision 2026-10-10).
 
 Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e`, then `/code-review` + `ponytail-review`, then commit.
 

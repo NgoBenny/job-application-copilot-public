@@ -75,6 +75,18 @@ export type SkillDecision = { pick: number } | { suggestions: string[] } | { non
  * Given the options a search returned, pick only an exact match for the spelling searched.
  * Anything else that mentions it is a "broader suggestion" for the user to approve; nothing is picked on its own.
  */
+/**
+ * Whether a chip already on the page is this skill. Sites pre-fill chips like "Python (Programming Language) (Suggested)"
+ * or "Structured Query Language (SQL)": the "(Suggested)" marker and a "Programming Language" suffix are ignored, and the
+ * name or its bracketed abbreviation must equal the skill exactly ("Java (Programming Language)" is not JavaScript).
+ */
+export function chipIsSkill(chip: string, spelling: string): boolean {
+  const name = chip.replace(/\s*\(suggested\)\s*$/i, '').replace(/\s*\(?programming language\)?\s*$/i, '').trim();
+  const [, base, abbr] = /^(.*?)\s*(?:\(([^()]*)\))?$/.exec(name) ?? [];
+  const want = skillKey(spelling);
+  return [name, base, abbr].some((n) => !!n && skillKey(n) === want);
+}
+
 export function decideSkill(options: readonly string[], spelling: string): SkillDecision {
   const exact = options.findIndex((o) => skillKey(o) === skillKey(spelling));
   if (exact >= 0) return { pick: exact };

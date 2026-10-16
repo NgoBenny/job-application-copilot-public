@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decideSkill, mentions, rankSkills, sameSkill, skillKey, spellings } from '../../src/domain/skills';
+import { chipIsSkill, decideSkill, mentions, rankSkills, sameSkill, skillKey, spellings } from '../../src/domain/skills';
 
 describe('skill identity', () => {
   it('ignores case, spaces and hyphens', () => expect(skillKey('Scikit-Learn')).toBe(skillKey('scikit learn')));
@@ -15,6 +15,18 @@ describe('skill identity', () => {
   it('tries the name first, then aliases, then user-approved options', () => {
     expect(spellings('ReactJS', [{ skill: 'reactjs', option: 'React (JavaScript Library)' }])).toEqual(['ReactJS', 'React', 'React.js', 'React (JavaScript Library)']);
   });
+});
+
+describe('chipIsSkill: chips the site pre-filled (live Workday 2026-10-16)', () => {
+  it.each([
+    ['Python (Programming Language) (Suggested)', 'Python'], ['Structured Query Language (SQL) (Suggested)', 'SQL'],
+    ['C++ Programming Language (Suggested)', 'C++'], ['Machine Learning (ML) (Suggested)', 'Machine Learning'],
+    ['C Sharp (Programming Language) (Suggested)', 'C Sharp'], ['Linux (Suggested)', 'Linux'], ['Docker', 'Docker'],
+  ])('"%s" is %s', (chip, skill) => expect(chipIsSkill(chip, skill)).toBe(true));
+  it.each([
+    ['Java (Programming Language) (Suggested)', 'JavaScript'], ['C Sharp (Programming Language) (Suggested)', 'C'],
+    ['C++ Programming Language (Suggested)', 'C'], ['Database Management Systems (DBMS) (Suggested)', 'Database Management'],
+  ])('"%s" is not %s', (chip, skill) => expect(chipIsSkill(chip, skill)).toBe(false));
 });
 
 describe('mentions', () => {

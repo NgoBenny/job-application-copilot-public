@@ -10,8 +10,10 @@ const json = () => fromTailoredJson(TailoredResumeJSON.parse(example));
 
 describe('TailoredResumeJSON', () => {
   it('accepts the shipped example', () => expect(TailoredResumeJSON.safeParse(example).success).toBe(true));
-  it('rejects unknown fields and bad urls', () => {
-    expect(TailoredResumeJSON.safeParse({ ...example, password: 'x' }).success).toBe(false);
+  it('drops unknown sections instead of keeping them, and still rejects bad urls (live 2026-10-15: "target_role")', () => {
+    const parsed = TailoredResumeJSON.parse({ ...example, password: 'x', target_role: { company: 'Example Co' } });
+    expect(parsed).not.toHaveProperty('password');
+    expect(parsed).not.toHaveProperty('target_role');
     expect(TailoredResumeJSON.safeParse({ ...example, links: [{ url: 'javascript:alert(1)' }] }).success).toBe(false);
   });
   it('accepts skills written as plain names, as tailoring chats do (live 2026-10-14)', () => {

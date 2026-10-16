@@ -11,7 +11,7 @@ const RULES: [Protection, RegExp][] = [
   // Also acknowledgements and messaging consents ("Applicant Privacy Acknowledgement", "receive communications via SMS"; live Greenhouse 2026-10-12).
   ['attestation', /\b(i (agree|accept|certify|acknowledge|attest|consent)|acknowledg(e|ement|ment)|receive (communications|messages|texts|text messages)|opt[- ]in|terms (and|&) conditions|terms of (use|service)|privacy (policy|statement)|e-?signature|electronic signature|sign(ature)? (here|below)|attestation|certif(y|ication) (that|statement))\b/i],
   ['authorization', /\b(authori[sz]ed to work|work authori[sz]ation|eligible to work|legally (authorized|eligible|permitted)|sponsor(ship)?|visa|citizenship|citizen|immigration|right to work|work permit|export control)\b/i],
-  ['demographic', /\b(gender|sex|race|racial|ethnicity|ethnic|hispanic|latino|veterans?|military|disabilit(y|ies)|sexual orientation|transgender|pronouns?|date of birth|birth ?date|age|marital|religion|self[- ]identif\w*|voluntary disclosures?|equal (employment )?opportunity|eeo)\b/i],
+  ['demographic', /\b(gender|sex|race|racial|ethnicity|ethnic|hispanic|latino|veterans?|military|disabilit(y|ies)|sexual orientation|transgender|pronouns?|date of birth|birth ?date|age|18 (years )?or (older|over)|at least 18|marital|religion|self[- ]identif\w*|voluntary disclosures?|equal (employment )?opportunity|eeo)\b/i],
   ['legal', /\b(convicted|conviction|criminal|felony|misdemeanor|arrest(ed)?|background check|non-?compete|non-?solicit|government (official|employee)|debarred|terminated (from|for cause)|discharged)\b/i],
 ];
 

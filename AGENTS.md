@@ -15,7 +15,7 @@ Status: `docs/implementation-progress.md` (update it at every phase gate).
 - Never overwrite a value the user changed. A value present on first scan has unknown authorship → explicit approval only.
 - No real personal data in the repo, tests, fixtures, screenshots or commit messages. Fabricated people only.
 - Never claim live Workday compatibility without the user's recorded manual results.
-- Git: work on `feat/workday-v1`; after each passing phase gate, commit and `git push` to `origin` (private repo the project repo, user decision 2026-10-10). Never force-push, never publish to a store, never add other remotes.
+- Git: work on `feat/workday-v1`; after each passing phase gate, commit and `git push` to `origin` (the private GitHub repo, user decision 2026-10-10). Never force-push, never publish to a store, never add other remotes.
 
 ## Architecture and module boundaries
 

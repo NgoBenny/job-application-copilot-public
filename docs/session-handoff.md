@@ -4,7 +4,7 @@ Read this first in a new Claude Code session, then `AGENTS.md`, `CLAUDE.md` and 
 
 ## Where things stand
 - **Project:** Job Application Copilot, a local-first Chrome MV3 extension (WXT + React + TypeScript + Tailwind + Zod). v1 has a Workday adapter only. Spec: `docs/requirements/`. Approved plan: `docs/plans/claude-code-implementation-plan.md`.
-- **Phases 0–8 are complete**, plus post-release fixes. Branch `feat/workday-v1`, pushed to the private repo the project repo. CI (GitHub Actions) is green.
+- **Phases 0–8 are complete**, plus post-release fixes. Branch `feat/workday-v1`, pushed to the private GitHub repo. CI (GitHub Actions) is green.
 - **Repo location:** moved out of OneDrive to `C:\Users\User\dev\job-application-copilot` because OneDrive sync removed and locked files in `node_modules`. The old copy at `C:\Users\User\OneDrive\Documents\ChatGPT\Workday Automation` is obsolete. Delete it only when the user says so.
 - **Tests:** 259 unit tests, 31 E2E (Playwright with synthetic Workday fixtures). Gate: `npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e`.
 

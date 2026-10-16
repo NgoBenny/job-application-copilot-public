@@ -5,14 +5,14 @@ import { PartialDate, SafeUrl, text } from '../fields';
  * The companion JSON a resume-tailoring chat produces next to the PDF.
  * Proposals only: never proof of a fact, never written to the master profile without approval.
  */
-export const TailoredResumeJSON = z.strictObject({
+// Lenient on shape, strict on content: chats add sections and fields freely ("target_role", "technologies"…), so unknown
+// keys are dropped rather than failing the import; every field kept is validated, and dropped data is never stored.
+export const TailoredResumeJSON = z.object({
   schemaVersion: z.literal(1),
-  job: z.strictObject({ company: text(), title: text(), url: SafeUrl.default(''), description: text(20_000).default('') }),
-  resume: z.strictObject({ filename: text(255) }),
-  candidate: z.strictObject({ firstName: text(100), lastName: text(100), email: text(254).default(''), phone: text(40).default('') }),
-  links: z.array(z.strictObject({ kind: z.enum(['linkedin', 'github', 'portfolio', 'other']).default('other'), url: SafeUrl })).max(20).default([]),
-  // Entries drop fields they don't use (chats add "technologies", "gpa", …) instead of failing the whole import;
-  // the fields kept are still validated, and dropped data never reaches the profile.
+  job: z.object({ company: text(), title: text(), url: SafeUrl.default(''), description: text(20_000).default('') }),
+  resume: z.object({ filename: text(255) }),
+  candidate: z.object({ firstName: text(100), lastName: text(100), email: text(254).default(''), phone: text(40).default('') }),
+  links: z.array(z.object({ kind: z.enum(['linkedin', 'github', 'portfolio', 'other']).default('other'), url: SafeUrl })).max(20).default([]),
   education: z.array(z.object({
     masterRecordId: text(64).optional(),
     school: text(), degree: text().default(''), major: text().default(''),
@@ -32,7 +32,7 @@ export const TailoredResumeJSON = z.strictObject({
   // Chats also group them by category ({ "languages": [...], "tools": [...] }): the groups are merged into one list.
   skills: z.preprocess((v) => (v && typeof v === 'object' && !Array.isArray(v) ? Object.values(v).flat() : v), z.array(z.union([
     text(100).min(1).transform((name) => ({ name, source: 'resume' as const, evidence: '' })),
-    z.strictObject({ name: text(100).min(1), source: z.enum(['resume', 'job', 'both']).default('resume'), evidence: text(500).default('') }),
+    z.object({ name: text(100).min(1), source: z.enum(['resume', 'job', 'both']).default('resume'), evidence: text(500).default('') }),
   ])).max(300).default([])),
 });
 export type TailoredResumeJSON = z.infer<typeof TailoredResumeJSON>;

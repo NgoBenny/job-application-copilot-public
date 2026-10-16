@@ -76,7 +76,7 @@ export function renderTemplate(text: string, ctx: Pick<MemoryContext, 'employer'
 
 // ---- Sensitive answers (user decision 2026-10-10): only from what the user typed in the dashboard ----
 
-export type SensitiveTopic = 'gender' | 'race' | 'hispanic' | 'veteran' | 'disability' | 'authorizedToWork' | 'sponsorship' | 'conviction';
+export type SensitiveTopic = 'gender' | 'race' | 'hispanic' | 'veteran' | 'disability' | 'authorizedToWork' | 'sponsorship' | 'conviction' | 'over18';
 
 export const SENSITIVE_TOPICS: { topic: SensitiveTopic; category: Exclude<Protection, 'credential' | 'attestation'>; title: string; re: RegExp }[] = [
   { topic: 'gender', category: 'demographic', title: 'Gender', re: /\bgender\b|\bsex\b/ },
@@ -88,6 +88,8 @@ export const SENSITIVE_TOPICS: { topic: SensitiveTopic; category: Exclude<Protec
   { topic: 'authorizedToWork', category: 'authorization', title: 'Authorized to work', re: /authori[sz]ed to work|eligible to work|legally (authorized|eligible|permitted)|right to work/ },
   { topic: 'sponsorship', category: 'authorization', title: 'Needs visa sponsorship', re: /sponsor/ },
   { topic: 'conviction', category: 'legal', title: 'Criminal conviction', re: /convicted|conviction|felony/ },
+  // "Are you 18 years or older?", "Are you at least 18 years of age?" (live Workday 2026-10-16).
+  { topic: 'over18', category: 'demographic', title: '18 or older', re: /\b18 (years )?(or older|of age|or over)\b|\bat least 18\b|\bover (the age of )?18\b/ },
 ];
 
 export interface SensitiveAnswer { topic: SensitiveTopic; answer: string }

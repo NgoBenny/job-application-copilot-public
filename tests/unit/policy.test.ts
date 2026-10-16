@@ -8,7 +8,7 @@ describe('classifyProtection', () => {
     ['Password', 'credential'], ['Verify New Password', 'credential'], ['Enter the verification code', 'credential'], ['One-time passcode', 'credential'],
     ['I agree to the Terms and Conditions', 'attestation'], ['Applicant Privacy Acknowledgement', 'attestation'], ['Would you like to receive communications via SMS and/or WhatsApp to the number provided?', 'attestation'], ['Electronic Signature', 'attestation'], ['I certify that the information is true', 'attestation'],
     ['Are you legally authorized to work in the United States?', 'authorization'], ['Will you now or in the future require sponsorship?', 'authorization'], ['Visa status', 'authorization'],
-    ['Gender', 'demographic'], ['Please select your ethnicity', 'demographic'], ['Veteran Status', 'demographic'], ['Disability status', 'demographic'], ['Date of Birth', 'demographic'],
+    ['Gender', 'demographic'], ['Please select your ethnicity', 'demographic'], ['Veteran Status', 'demographic'], ['Disability status', 'demographic'], ['Date of Birth', 'demographic'], ['Are you 18 or older?', 'demographic'],
     ['Have you ever been convicted of a felony?', 'legal'], ['Are you subject to a non-compete agreement?', 'legal'],
   ])('%s → %s', (label, want) => expect(c(label)).toBe(want));
 

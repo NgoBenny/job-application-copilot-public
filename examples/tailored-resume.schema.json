@@ -41,8 +41,7 @@
       "required": [
         "company",
         "title"
-      ],
-      "additionalProperties": false
+      ]
     },
     "resume": {
       "type": "object",
@@ -54,8 +53,7 @@
       },
       "required": [
         "filename"
-      ],
-      "additionalProperties": false
+      ]
     },
     "candidate": {
       "type": "object",
@@ -82,8 +80,7 @@
       "required": [
         "firstName",
         "lastName"
-      ],
-      "additionalProperties": false
+      ]
     },
     "links": {
       "default": [],
@@ -118,8 +115,7 @@
         },
         "required": [
           "url"
-        ],
-        "additionalProperties": false
+        ]
       }
     },
     "education": {
@@ -287,8 +283,7 @@
             },
             "required": [
               "name"
-            ],
-            "additionalProperties": false
+            ]
           }
         ]
       }
@@ -299,6 +294,5 @@
     "job",
     "resume",
     "candidate"
-  ],
-  "additionalProperties": false
+  ]
 }

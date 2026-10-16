@@ -113,7 +113,7 @@ export const QuestionMemorySchema = z.strictObject({
 
 /** Sensitive answers the user typed in the dashboard (user decision 2026-10-10). */
 export const SensitiveAnswerSchema = z.strictObject({
-  topic: z.enum(['gender', 'race', 'hispanic', 'veteran', 'disability', 'authorizedToWork', 'sponsorship', 'conviction']),
+  topic: z.enum(['gender', 'race', 'hispanic', 'veteran', 'disability', 'authorizedToWork', 'sponsorship', 'conviction', 'over18']),
   answer: text(1000).min(1), // several wordings, one per line
 });
 

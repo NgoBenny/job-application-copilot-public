@@ -36,6 +36,13 @@ describe('searchSkills', { timeout: 30_000 }, () => {
     expect(input.value).toBe('');
   });
 
+  it('counts a chip the site pre-filled as "(Suggested)" as already there (live 2026-10-16)', async () => {
+    const input = widget(['Python', 'Python (Programming Language)']);
+    input.insertAdjacentHTML('beforebegin', '<span data-automation-id="selectedItem">Python (Programming Language) (Suggested)</span>');
+    expect(await searchSkills(input, [{ name: 'Python', spellings: ['Python'] }], never)).toEqual([{ name: 'Python', status: 'alreadySelected', option: 'Python (Programming Language) (Suggested)' }]);
+    expect(document.querySelectorAll('[data-automation-id="selectedItem"]')).toHaveLength(2); // TypeScript from the widget + the suggested one; nothing added
+  });
+
   it('never re-adds a skill that is already selected', async () => {
     const input = widget(['TypeScript']);
     expect(await searchSkills(input, [{ name: 'TS', spellings: ['TS', 'TypeScript'] }], never)).toEqual([{ name: 'TS', status: 'alreadySelected', option: 'TypeScript' }]);
