@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title></title><script src="/instrument.js"></script></head>
+<body>
+<!-- Fabricated tenant built from live QA notes (docs/qa/2026-10-11-workday-employer-2.md): structure only, no real data.
+     State after "Autofill with Resume": the parser created and partly filled the entries, in its own order. -->
+<main><div data-automation-id="applyFlowPage">
+  <h1></h1>
+  <h2 data-automation-id="jobTitleHeading">Software Intern (fabricated)</h2>
+  <ol data-automation-id="progressBar">
+    <li data-automation-id="progressBarCompletedStep"><label>completed step 1 of 3</label><label>My Information</label></li>
+    <li data-automation-id="progressBarActiveStep" data-step-name="My Experience"><label>current step 2 of 3</label></li>
+    <li data-automation-id="progressBarInactiveStep"><label>step 3 of 3</label><label>Application Questions</label></li>
+  </ol>
+  <div><h3>My Experience</h3><div data-automation-id="applyFlowMyExpPage">
+    <div role="group" aria-labelledby="Work-Experience-section"><h4 id="Work-Experience-section">Work Experience</h4>
+      <div><h5 id="Work-Experience-1-panel">Work Experience 1</h5></div>
+      <div role="group" aria-labelledby="Work-Experience-1-panel"><div>
+        <!-- Parser misread the title (check 5: a value already on the page is never "safe" to change). -->
+        <div data-automation-id="formField-jobTitle"><label for="workExperience-3--jobTitle">Job Title*</label><input id="workExperience-3--jobTitle" type="text" data-wd="text" value="Software Engineer Intern"></div>
+        <div data-automation-id="formField-companyName"><label for="workExperience-3--companyName">Company*</label><input id="workExperience-3--companyName" type="text" data-wd="text" value="Acme Robotics"></div>
+      </div></div>
+    </div>
+
+    <!-- Degrees listed only by level; a GPA field in each entry; entries in the parser's order, not the profile's. -->
+    <div role="group" aria-labelledby="Education-section"><h4 id="Education-section">Education</h4>
+      <div><h5 id="Education-1-panel">Education 1</h5></div>
+      <div role="group" aria-labelledby="Education-1-panel"><div>
+        <div data-automation-id="formField-schoolName"><label for="education-4--schoolName">School or University*</label><input id="education-4--schoolName" type="text" data-wd="text" value="Sample Institute of Technology"></div>
+        <div data-automation-id="formField-degree"><label for="education-4--degree">Degree*</label><button aria-haspopup="listbox" type="button" id="education-4--degree" data-wd="dropdown" data-required="Degree 1" data-options="High School|Associates|Bachelors|Masters|Doctorate">Select One</button></div>
+        <div data-automation-id="formField-gradeAverage"><label for="education-4--gradeAverage">Overall Result (GPA)</label><input id="education-4--gradeAverage" type="text" data-wd="text"></div>
+      </div></div>
+      <div><h5 id="Education-2-panel">Education 2</h5></div>
+      <div role="group" aria-labelledby="Education-2-panel"><div>
+        <div data-automation-id="formField-schoolName"><label for="education-5--schoolName">School or University*</label><input id="education-5--schoolName" type="text" data-wd="text" value="Example State University"></div>
+        <div data-automation-id="formField-degree"><label for="education-5--degree">Degree*</label><button aria-haspopup="listbox" type="button" id="education-5--degree" data-wd="dropdown" data-required="Degree 2" data-options="High School|Associates|Bachelors|Masters|Doctorate">Select One</button></div>
+        <div data-automation-id="formField-gradeAverage"><label for="education-5--gradeAverage">Overall Result (GPA)</label><input id="education-5--gradeAverage" type="text" data-wd="text"></div>
+      </div></div>
+    </div>
+  </div></div>
+  <button data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+</div></main>
+<script src="/live-like.js"></script>
+</body></html>

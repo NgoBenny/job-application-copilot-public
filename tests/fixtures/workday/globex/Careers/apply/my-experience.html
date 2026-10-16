@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apply - Globex (fabricated)</title><script src="/instrument.js"></script></head>
+<body>
+<main data-automation-id="applyFlowPage">
+  <nav data-automation-id="progressBar"><span>My Information</span><span aria-current="step">My Experience</span><span>Review</span></nav>
+  <h2>My Experience</h2>
+  <section data-automation-id="workExperienceSection">
+    <h3>Work Experience</h3>
+    <div role="group" aria-labelledby="we1">
+      <h4 id="we1">Work Experience 1</h4>
+      <span id="we1-t">Job Title</span><input id="we1-title" aria-labelledby="we1-t" type="text" value="Software Engineering Intern">
+      <span id="we1-c">Company</span><input id="we1-co" aria-labelledby="we1-c" type="text" value="Acme Robotics Inc">
+      <label><input type="checkbox" data-automation-id="currentlyWorkHere"> I currently work here</label>
+      <div data-automation-id="formField-startDate"><label>From</label>
+        <div data-automation-id="dateInputWrapper"><input data-automation-id="dateSectionMonth-input" aria-label="Month" value="6"><input data-automation-id="dateSectionYear-input" aria-label="Year" value="2024"></div></div>
+      <div data-automation-id="formField-endDate"><label>To</label>
+        <div data-automation-id="dateInputWrapper"><input data-automation-id="dateSectionMonth-input" aria-label="Month" value=""><input data-automation-id="dateSectionYear-input" aria-label="Year" value=""></div></div>
+      <label for="we1-d">Role Description</label><textarea id="we1-d">Built a test harness</textarea>
+    </div>
+    <div role="group" aria-labelledby="we2">
+      <h4 id="we2">Work Experience 2</h4>
+      <span id="we2-t">Job Title</span><input id="we2-title" aria-labelledby="we2-t" type="text" value="Teaching Assistant">
+      <span id="we2-c">Company</span><input id="we2-co" aria-labelledby="we2-c" type="text" value="Example State">
+    </div>
+    <button type="button" data-automation-id="add-button" data-add-record="tpl-we">Add Another</button>
+  </section>
+  <section data-automation-id="educationSection">
+    <h3>Education</h3>
+    <div data-automation-id="education-1">
+      <h4>Education 1</h4>
+      <div data-automation-id="formField-school"><label for="sch">School or University</label><input id="sch" role="combobox" aria-expanded="false" value="Example State Univ"></div>
+      <div data-automation-id="formField-degree"><label id="dg">Degree</label><button type="button" aria-haspopup="listbox" aria-labelledby="dg" data-options="Associate (AA)|Bachelor of Science (BS)|Master of Science (MS)">Select One</button></div>
+      <div data-automation-id="formField-lastYearAttended"><label>To (Actual or Expected)</label>
+        <div data-automation-id="dateInputWrapper"><input data-automation-id="dateSectionYear-input" aria-label="Year" value="2025"></div></div>
+    </div>
+  </section>
+  <section data-automation-id="skillsSection">
+    <h3>Skills</h3>
+    <div data-automation-id="formField-skills"><label for="sk">Type to Add Skills</label>
+      <div data-automation-id="multiselectInputContainer">
+        <span data-automation-id="selectedItem">TypeScript</span>
+        <input id="sk" data-automation-id="searchBox" type="text" value="" data-skill-options="TypeScript|JavaScript|React|React Native|Node.js|Python (Programming Language)|SQL|Git|Amazon Web Services (AWS)" data-skill-delay="300" data-skill-hang="rust">
+      </div></div>
+  </section>
+  <section>
+    <h3>Resume/CV</h3>
+    <input type="file" data-automation-id="file-upload-input-ref" aria-label="Upload a file">
+  </section>
+  <section>
+    <h3>Additional Information</h3>
+    <label for="d1">Details</label><input id="d1" type="text" value="">
+    <label for="d2">Details</label><input id="d2" type="text" value="">
+  </section>
+  <div hidden><label for="hid">Hidden Field</label><input id="hid" type="text" value="secret"></div>
+  <button type="button" data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+</main>
+<template id="tpl-we"><div role="group" aria-labelledby="we{n}"><h4 id="we{n}">Work Experience {n}</h4><span id="we{n}-t">Job Title</span><input id="we{n}-title" aria-labelledby="we{n}-t" type="text" value="" data-controlled><span id="we{n}-c">Company</span><input id="we{n}-co" aria-labelledby="we{n}-c" type="text" value="" data-controlled></div></template>
+<script src="/widgets.js"></script>
+</body></html>

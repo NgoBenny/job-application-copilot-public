@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm test)",
+      "Bash(npm run test)",
+      "Bash(npm run build)",
+      "Bash(npm run build:e2e)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm run zip)",
+      "Bash(npx playwright install chromium)"
+    ]
+  }
+}

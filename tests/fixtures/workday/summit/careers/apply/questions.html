@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title></title><script src="/instrument.js"></script></head>
+<body>
+<!-- Fabricated tenant built from live QA notes (docs/qa/2026-10-11-workday-employer-2.md): structure only, no real data. -->
+<main><div data-automation-id="applyFlowPage">
+  <h1></h1>
+  <h2 data-automation-id="jobTitleHeading">Software Intern (fabricated)</h2>
+  <ol data-automation-id="progressBar">
+    <li data-automation-id="progressBarCompletedStep"><label>completed step 2 of 3</label><label>My Experience</label></li>
+    <li data-automation-id="progressBarActiveStep" data-step-name="Application Questions"><label>current step 3 of 3</label></li>
+  </ol>
+  <div><h3>Application Questions</h3>
+    <div role="group" aria-labelledby="Questions-section"><h4 id="Questions-section">Questions</h4>
+      <!-- Month / day / year; the label ends in a colon. -->
+      <div data-automation-id="formField-dateAvailable"><label>Date Available:*</label><div><div data-automation-id="dateInputWrapper" role="group" id="dateAvailable" data-required="Date Available">
+        <div data-automation-id="dateSectionMonth-display">MM</div><input type="text" role="spinbutton" aria-label="Month" data-automation-id="dateSectionMonth-input" id="dateAvailable-dateSectionMonth-input">
+        <div data-automation-id="dateSectionDay-display">DD</div><input type="text" role="spinbutton" aria-label="Day" data-automation-id="dateSectionDay-input" id="dateAvailable-dateSectionDay-input">
+        <div data-automation-id="dateSectionYear-display">YYYY</div><input type="text" role="spinbutton" aria-label="Year" data-automation-id="dateSectionYear-input" id="dateAvailable-dateSectionYear-input">
+      </div></div></div>
+    </div>
+    <div role="group" aria-labelledby="Terms-section"><h4 id="Terms-section">Terms and Conditions</h4>
+      <!-- Consent stays the user's: never ticked by the extension. -->
+      <div data-automation-id="formField-agreement"><label for="agreement"><input type="checkbox" id="agreement" data-wd="check" data-required="Terms"> Yes, I have read and consent to the terms and conditions</label></div>
+    </div>
+  </div>
+  <button data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+</div></main>
+<script src="/live-like.js"></script>
+</body></html>

@@ -1,0 +1,16 @@
+node_modules/
+.output/
+.wxt/
+dist/
+test-results/
+playwright-report/
+coverage/
+*.log
+.env*
+
+# Personal data must never be committed
+profiles/
+exports/
+*.backup.json
+*.pdf
+!tests/fixtures/**/*.pdf

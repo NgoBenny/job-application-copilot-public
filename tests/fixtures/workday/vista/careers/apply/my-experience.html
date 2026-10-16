@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title></title><script src="/instrument.js"></script></head>
+<body>
+<!-- Fabricated tenant built from live QA notes (docs/qa/2026-10-10-workday-employer-1.md): structure only, no real data. -->
+<main><div data-automation-id="applyFlowPage">
+  <h1></h1>
+  <h2 data-automation-id="jobTitleHeading">Junior Developer (fabricated)</h2>
+  <ol data-automation-id="progressBar">
+    <li data-automation-id="progressBarCompletedStep"><label>completed step 1 of 3</label><label>My Information</label></li>
+    <li data-automation-id="progressBarActiveStep" data-step-name="My Experience"><label>current step 2 of 3</label></li>
+    <li data-automation-id="progressBarInactiveStep"><label>step 3 of 3</label><label>Review</label></li>
+  </ol>
+  <div><h3>My Experience</h3><div data-automation-id="applyFlowMyExpPage">
+    <!-- Sections are h4; each entry's h5 sits outside its group, linked by aria-labelledby (entries and Add Another bugs). -->
+    <div role="group" aria-labelledby="Work-Experience-section"><h4 id="Work-Experience-section">Work Experience</h4>
+      <div><h5 id="Work-Experience-1-panel">Work Experience 1</h5></div>
+      <div role="group" aria-labelledby="Work-Experience-1-panel"><div>
+        <div data-automation-id="formField-jobTitle"><label for="workExperience-7--jobTitle">Job Title*</label><input id="workExperience-7--jobTitle" type="text" data-wd="text" data-required="Job Title"></div>
+        <div data-automation-id="formField-companyName"><label for="workExperience-7--companyName">Company*</label><input id="workExperience-7--companyName" type="text" data-wd="text" data-required="Company"></div>
+        <div data-automation-id="formField-startDate"><label>From*</label><div><div data-automation-id="dateInputWrapper" role="group" id="workExperience-7--startDate" data-required="From">
+          <div data-automation-id="dateSectionMonth-display">MM</div><input type="text" role="spinbutton" aria-label="Month" data-automation-id="dateSectionMonth-input" id="workExperience-7--startDate-dateSectionMonth-input">
+          <div data-automation-id="dateSectionYear-display">YYYY</div><input type="text" role="spinbutton" aria-label="Year" data-automation-id="dateSectionYear-input" id="workExperience-7--startDate-dateSectionYear-input">
+        </div></div></div>
+        <div data-automation-id="formField-endDate"><label>To*</label><div><div data-automation-id="dateInputWrapper" role="group" id="workExperience-7--endDate" data-required="To">
+          <div data-automation-id="dateSectionMonth-display">MM</div><input type="text" role="spinbutton" aria-label="Month" data-automation-id="dateSectionMonth-input" id="workExperience-7--endDate-dateSectionMonth-input">
+          <div data-automation-id="dateSectionYear-display">YYYY</div><input type="text" role="spinbutton" aria-label="Year" data-automation-id="dateSectionYear-input" id="workExperience-7--endDate-dateSectionYear-input">
+        </div></div></div>
+      </div></div>
+      <button type="button" data-wd-add="tpl-work">Add Another</button>
+    </div>
+    <template id="tpl-work">
+      <div><h5 id="Work-Experience-{n}-panel">Work Experience {n}</h5></div>
+      <div role="group" aria-labelledby="Work-Experience-{n}-panel"><div>
+        <div data-automation-id="formField-jobTitle"><label for="workExperience-{n}0--jobTitle">Job Title*</label><input id="workExperience-{n}0--jobTitle" type="text" data-wd="text" data-required="Job Title {n}"></div>
+        <div data-automation-id="formField-companyName"><label for="workExperience-{n}0--companyName">Company*</label><input id="workExperience-{n}0--companyName" type="text" data-wd="text" data-required="Company {n}"></div>
+      </div></div>
+    </template>
+
+    <div role="group" aria-labelledby="Education-section"><h4 id="Education-section">Education</h4>
+      <div><h5 id="Education-1-panel">Education 1</h5></div>
+      <div role="group" aria-labelledby="Education-1-panel"><div>
+        <div data-automation-id="formField-schoolName"><label for="education-8--schoolName">School or University*</label><input id="education-8--schoolName" type="text" data-wd="text" data-required="School or University"></div>
+        <!-- Degrees listed only as abbreviations (degree bug). -->
+        <div data-automation-id="formField-degree"><label for="education-8--degree">Degree*</label><button aria-haspopup="listbox" type="button" id="education-8--degree" data-wd="dropdown" data-required="Degree" data-options="A.A.|B.A.|B.S.|M.A.|M.S.|MBA">Select One</button></div>
+        <!-- Single-choice search box; no plain "Computer Science" exists (Field of Study). -->
+        <div data-automation-id="formField-fieldOfStudy"><label for="education-8--fieldOfStudy">Field of Study</label>
+          <div data-automation-id="multiselectInputContainer" data-field="education-8--fieldOfStudy"><div><input id="education-8--fieldOfStudy" type="text" data-wd="search" data-options="Computer and Information Science|Computer Engineering|Computer Graphics|Accounting"></div></div></div>
+      </div></div>
+    </div>
+
+    <div role="group" aria-labelledby="Skills-section"><h4 id="Skills-section">Skills</h4>
+      <!-- "PSD to HTML CSS" appears in both the CSS and the HTML results (stale-results bug). -->
+      <div data-automation-id="formField-skills"><label for="skills--skills">Type to Add Skills</label>
+        <div data-automation-id="multiselectInputContainer" data-field="skills"><div><input id="skills--skills" type="text" data-wd="search" data-multi="true" data-options="CSS|PSD to HTML CSS|HTML|HTML5|TypeScript|React|React Native"></div></div></div>
+    </div>
+  </div></div>
+  <button data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+</div></main>
+<script src="/live-like.js"></script>
+</body></html>

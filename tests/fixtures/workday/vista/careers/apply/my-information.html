@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title></title><script src="/instrument.js"></script></head>
+<body>
+<!-- Fabricated tenant built from live QA notes (docs/qa/2026-10-10-workday-employer-1.md): structure only, no real data. -->
+<main><div data-automation-id="applyFlowPage">
+  <h1></h1>
+  <h2 data-automation-id="jobTitleHeading">Junior Developer (fabricated)</h2>
+  <ol data-automation-id="progressBar">
+    <li data-automation-id="progressBarActiveStep" data-step-name="My Information"><label>current step 1 of 3</label></li>
+    <li data-automation-id="progressBarInactiveStep"><label>step 2 of 3</label><label>My Experience</label></li>
+    <li data-automation-id="progressBarInactiveStep"><label>step 3 of 3</label><label>Review</label></li>
+  </ol>
+  <div><h3>My Information</h3>
+    <div role="group" aria-labelledby="Legal-Name-section"><h4 id="Legal-Name-section">Legal Name</h4>
+      <div data-automation-id="formField-legalName--firstName"><label for="name--legalName--firstName">First Name*</label><input id="name--legalName--firstName" type="text" data-wd="text" data-required="First Name"></div>
+      <div data-automation-id="formField-legalName--lastName"><label for="name--legalName--lastName">Last Name*</label><input id="name--legalName--lastName" type="text" data-wd="text" data-required="Last Name"></div>
+    </div>
+    <div role="group" aria-labelledby="Address-section"><h4 id="Address-section">Address</h4>
+      <div data-automation-id="formField-country"><label for="country--country">Country*</label><button aria-haspopup="listbox" type="button" id="country--country" data-wd="dropdown" data-required="Country" data-options="Canada|United States of America|Mexico">Select One</button></div>
+      <div data-automation-id="formField-countryRegion"><label for="address--countryRegion">State*</label><button aria-haspopup="listbox" type="button" id="address--countryRegion" data-wd="dropdown" data-required="State" data-options="Alabama|California|Texas">Select One</button></div>
+      <div data-automation-id="formField-city"><label for="address--city">City*</label><input id="address--city" type="text" data-wd="text" data-required="City"></div>
+    </div>
+    <div role="group" aria-labelledby="Phone-section"><h4 id="Phone-section">Phone</h4>
+      <!-- A chosen value shown as a pill inside an always-visible role=listbox (State dropdown bug). -->
+      <div data-automation-id="formField-countryPhoneCode"><label for="phoneNumber--countryPhoneCode">Country Phone Code*</label>
+        <div data-automation-id="multiselectInputContainer" data-field="phoneNumber--countryPhoneCode">
+          <div role="listbox" data-automation-id="selectedItemList" aria-label="items selected"><div role="option" data-automation-id="selectedItem">United States of America (+1)</div></div>
+          <input id="phoneNumber--countryPhoneCode" type="text" data-wd="search" data-options="United States of America (+1)|Canada (+1)">
+        </div></div>
+      <div data-automation-id="formField-phoneNumber"><label for="phoneNumber--phoneNumber">Phone Number*</label><input id="phoneNumber--phoneNumber" type="text" data-wd="text" data-required="Phone Number"></div>
+    </div>
+  </div>
+  <button data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+</div></main>
+<script src="/live-like.js"></script>
+</body></html>

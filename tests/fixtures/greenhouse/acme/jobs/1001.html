@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Job Application for Software Engineer Intern at Acme</title></head>
+<body>
+<!-- Synthetic Greenhouse job-boards form (fabricated employer). Structure copied from live pages on 2026-10-12. -->
+<main>
+  <h1>Software Engineer Intern</h1>
+  <form id="application-form" class="application--form" action="/acme/jobs/1001">
+    <div class="field-wrapper"><label for="first_name">First Name<span>*</span></label><input id="first_name" type="text" autocomplete="given-name" aria-required="true" class="input input__single-line"></div>
+    <div class="field-wrapper"><label for="last_name">Last Name<span>*</span></label><input id="last_name" type="text" autocomplete="family-name" aria-required="true" class="input input__single-line"></div>
+    <div class="field-wrapper"><label for="email">Email<span>*</span></label><input id="email" type="text" autocomplete="email" aria-required="true" class="input input__single-line"></div>
+    <fieldset class="phone-input"><legend class="visually-hidden">Phone</legend>
+      <div class="select" data-field="country" data-label="Country" data-dial="true" data-options='["Canada +1","United States +1","United Kingdom +44"]'></div>
+      <!-- The phone widget (intl-tel-input): its button names the chosen country; its search box is hidden until opened. -->
+      <div class="iti__country-container"><button type="button" class="iti__selected-country" title="" aria-label="Change country"></button>
+        <div class="iti__dropdown-content iti__hide" style="display:none"><input type="search" id="iti-0__search-input" class="iti__search-input" role="combobox" aria-label="Search">
+          <ul class="iti__country-list" role="listbox"><li class="iti__country" role="option" data-country-code="us">United States+1</li><li class="iti__country" role="option" data-country-code="gb">United Kingdom+44</li></ul></div></div>
+      <label for="phone">Phone</label><input id="phone" type="tel" class="input input__single-line iti__tel-input">
+    </fieldset>
+    <div class="select" data-field="candidate-location" data-label="Location (City)" data-async="true" data-options='["Springfield, Illinois, United States","Springfield, Missouri, United States","Example City, California, United States"]'></div>
+    <div class="file-upload"><label for="resume">Attach</label><input id="resume" type="file" class="visually-hidden"></div>
+
+    <div class="education--container">
+      <div class="education--form" data-index="0">
+        <div class="education--header"><p class="body body--medium">Education</p></div>
+        <div class="select" data-field="school--0" data-label="School" data-async="true" data-options='["Example State University","Example State University - North Campus","Sample Institute of Technology"]'></div>
+        <div class="select" data-field="degree--0" data-label="Degree" data-options='["High School","Associate&#39;s Degree","Bachelor&#39;s Degree","Master&#39;s Degree","Doctor of Philosophy (Ph.D.)"]'></div>
+        <div class="select" data-field="discipline--0" data-label="Discipline" data-options='["Computer Science","Computer Engineering","Mathematics"]'></div>
+        <div class="select" data-field="start-month--0" data-label="Start date month" data-options='["January","February","March","April","May","June","July","August","September","October","November","December"]'></div>
+        <label for="start-year--0">Start date year</label><input id="start-year--0" type="number" class="input input__single-line">
+        <div class="select" data-field="end-month--0" data-label="End date month" data-options='["January","February","March","April","May","June","July","August","September","October","November","December"]'></div>
+        <label for="end-year--0">End date year</label><input id="end-year--0" type="number" class="input input__single-line">
+      </div>
+      <button type="button" class="add-another-button">Add another</button>
+    </div>
+
+    <div class="application--questions">
+      <div class="field-wrapper"><label for="question_101">LinkedIn Profile</label><input id="question_101" type="text" class="input input__single-line"></div>
+      <div class="select" data-field="question_102" data-label="Are you legally authorized to work in the United States?" data-required="true" data-options='["Yes","No"]'></div>
+      <div class="select" data-field="question_103" data-label="How did you hear about this job?" data-options='["Job Board","Referral","Company Website"]'></div>
+      <div class="select" data-field="question_104" data-label="Applicant Privacy Acknowledgement" data-required="true" data-options='["I acknowledge"]'></div>
+      <fieldset id="question_105[]" class="checkbox"><legend class="label checkbox__description">Select all locations you would be open to</legend>
+        <div class="checkbox__wrapper"><input type="checkbox" id="question_105[]_1" name="question_105[]" value="1"><label for="question_105[]_1">Springfield</label></div>
+        <div class="checkbox__wrapper"><input type="checkbox" id="question_105[]_2" name="question_105[]" value="2"><label for="question_105[]_2">Example City</label></div>
+      </fieldset>
+      <div class="field-wrapper"><label for="question_106">Why do you want to work here?</label><textarea id="question_106"></textarea></div>
+    </div>
+
+    <div id="eeoc_fields" class="eeoc__container">
+      <h3>Voluntary Self-Identification</h3>
+      <p>Completing this section is voluntary.</p>
+      <div class="select" data-field="gender" data-label="Gender" data-options='["Male","Female","Decline To Self Identify"]'></div>
+      <div class="select" data-field="hispanic_ethnicity" data-label="Are you Hispanic/Latino?" data-options='["Yes","No","Decline To Self Identify"]'></div>
+      <div class="select" data-field="veteran_status" data-label="Veteran Status" data-options='["I am not a protected veteran","I identify as one or more of the classifications of protected veteran","I don&#39;t wish to answer"]'></div>
+    </div>
+
+    <button type="submit" class="btn btn--pill">Submit application</button>
+  </form>
+</main>
+<script type="module">
+  import { install } from '/react-select-like.js';
+  const template = document.querySelector('.education--form').innerHTML;
+  install(document);
+  // "Add another" appends a second education block, like the live board.
+  document.querySelector('.add-another-button').addEventListener('click', () => {
+    const blocks = document.querySelectorAll('.education--form');
+    const n = blocks.length;
+    const copy = document.createElement('div');
+    copy.className = 'education--form';
+    copy.innerHTML = template;
+    copy.querySelectorAll('[data-field]').forEach((d) => { d.dataset.field = d.dataset.field.replace(/--0$/, `--${n}`); });
+    copy.querySelectorAll('[id$="--0"]').forEach((e) => { e.id = e.id.replace(/--0$/, `--${n}`); });
+    copy.querySelectorAll('[for$="--0"]').forEach((e) => { e.htmlFor = e.htmlFor.replace(/--0$/, `--${n}`); });
+    blocks[n - 1].after(copy);
+    install(document);
+  });
+</script>
+</body>
+</html>

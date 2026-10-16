@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "job": {
+    "company": "Acme Robotics",
+    "title": "Software Engineer I",
+    "url": "https://acme.wd1.myworkdayjobs.com/en-US/careers/job/Software-Engineer-I_R-0001",
+    "description": ""
+  },
+  "resume": { "filename": "avery-acme-swe.pdf" },
+  "candidate": { "firstName": "Avery", "lastName": "Example", "email": "avery@example.com", "phone": "555-0100" },
+  "links": [
+    { "kind": "linkedin", "url": "https://linkedin.com/in/avery-example" },
+    { "kind": "github", "url": "https://github.com/avery-example" }
+  ],
+  "education": [
+    { "masterRecordId": "edu-1", "school": "Example State University", "degree": "Bachelor of Science", "major": "Computer Science", "start": "2021-09", "end": "2025-05" }
+  ],
+  "experience": [
+    {
+      "masterRecordId": "emp-1",
+      "employer": "Acme Robotics",
+      "title": "Software Engineering Intern",
+      "location": "Springfield, IL",
+      "start": "2024-06",
+      "end": "2024-08",
+      "current": false,
+      "bullets": ["Built a hardware-in-the-loop test harness in TypeScript that cut regression time from two hours to twenty minutes"]
+    },
+    { "employer": "Example State University", "title": "Teaching Assistant", "start": "2023-01", "end": "", "current": true, "bullets": ["Led weekly labs for 40 students"] }
+  ],
+  "projects": [{ "name": "Route Planner", "description": "Graph search visualizer", "bullets": ["Written in Rust"] }],
+  "skills": [
+    { "name": "TypeScript", "source": "resume", "evidence": "Skills section and Acme internship" },
+    { "name": "React", "source": "resume", "evidence": "Skills section" }
+  ]
+}

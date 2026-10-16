@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apply - Acme Robotics SPA (fabricated)</title><script src="/instrument.js"></script></head>
+<body>
+<div data-automation-id="applyFlowPage">
+  <div data-automation-id="progressBar"><div data-automation-id="progressBarActiveStep" id="step">My Information</div></div>
+  <div id="content">
+    <div data-automation-id="formField-legalNameSection_lastName"><label for="ln">Last Name</label><input id="ln" data-automation-id="legalNameSection_lastName" value=""></div>
+  </div>
+</div>
+<script>
+  // Simulates Workday's single-page Next/Back: the URL and step change without a page load.
+  const steps = {
+    'My Information': '<div data-automation-id="formField-legalNameSection_lastName"><label for="ln">Last Name</label><input id="ln" data-automation-id="legalNameSection_lastName" value=""></div>',
+    'My Experience': '<section data-automation-id="workExperienceSection"><h3>Work Experience</h3><div data-automation-id="workExperience-1"><h4>Work Experience 1</h4><div data-automation-id="formField-jobTitle"><label for="jt">Job Title</label><input id="jt" data-automation-id="jobTitle" value=""></div></div></section>',
+  };
+  function show(name, url) {
+    document.getElementById('step').textContent = name;
+    document.getElementById('content').innerHTML = steps[name];
+    if (url) history.pushState({ name }, '', url);
+  }
+  window.__goNext = () => show('My Experience', 'spa.html?step=2');
+  window.__goBack = () => history.back();
+  window.__goNextSameUrl = () => show('My Experience');
+  addEventListener('popstate', (e) => show(e.state?.name ?? 'My Information'));
+</script>
+</body></html>

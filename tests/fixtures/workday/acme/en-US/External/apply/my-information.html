@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apply - Acme Robotics (fabricated)</title><script src="/instrument.js"></script></head>
+<body>
+<div data-automation-id="applyFlowPage">
+  <ol data-automation-id="progressBar">
+    <li data-automation-id="progressBarActiveStep" aria-current="step">current step 1 of 5 My Information</li>
+    <li>My Experience</li><li>Application Questions</li><li>Voluntary Disclosures</li><li>Review</li>
+  </ol>
+  <h2>My Information</h2>
+  <div data-automation-id="legalNameSection">
+    <h3>Legal Name</h3>
+    <div data-automation-id="formField-legalNameSection_firstName"><label for="fn">First Name<abbr title="required">*</abbr></label>
+      <input id="fn" data-automation-id="legalNameSection_firstName" type="text" required value="Avery"></div>
+    <div data-automation-id="formField-legalNameSection_lastName"><label for="ln">Last Name<abbr title="required">*</abbr></label>
+      <input id="ln" data-automation-id="legalNameSection_lastName" type="text" required value="" data-controlled></div>
+  </div>
+  <div data-automation-id="contactInformationSection">
+    <h3>Contact Information</h3>
+    <div data-automation-id="formField-email"><label for="em">Email Address</label><input id="em" data-automation-id="email" type="email" value="avery@example.com"></div>
+    <div data-automation-id="formField-phone-number"><label for="ph">Phone Number</label><input id="ph" data-automation-id="phone-number" type="tel" value="" data-controlled></div>
+    <div data-automation-id="formField-countryDropdown"><label id="cl">Country</label>
+      <button type="button" aria-haspopup="listbox" aria-labelledby="cl" data-automation-id="countryDropdown" data-options="Canada|Mexico|United States of America">United States of America</button></div>
+    <div data-automation-id="formField-addressSection_city"><label for="ci">City</label><input id="ci" data-automation-id="addressSection_city" type="text" value="" data-controlled></div>
+    <div data-automation-id="formField-source"><label id="sl">How Did You Hear About Us?</label>
+      <button type="button" aria-haspopup="listbox" aria-labelledby="sl" data-automation-id="sourceDropdown" data-options="Job board|Referral|Company website">Select One</button></div>
+  </div>
+  <div data-automation-id="websiteSection">
+    <h3>Websites</h3>
+    <div data-automation-id="formField-linkedinQuestion"><label for="li">LinkedIn</label><input id="li" data-automation-id="linkedinQuestion" type="text" value="" data-controlled></div>
+  </div>
+  <fieldset data-automation-id="formField-previousWorker"><legend>Have you previously worked for Acme Robotics?</legend>
+    <label><input type="radio" name="prev" value="yes"> Yes</label><label><input type="radio" name="prev" value="no" checked> No</label></fieldset>
+  <div data-automation-id="errorMessage" role="alert">Last Name is required</div>
+  <button type="button" data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+</div>
+<script src="/widgets.js"></script>
+</body></html>

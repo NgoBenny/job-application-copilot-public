@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apply - Initech (fabricated)</title><script src="/instrument.js"></script></head>
+<body>
+<div data-automation-id="applyFlowPage">
+  <div data-automation-id="progressBar"><div data-automation-id="progressBarActiveStep">Step 3 of 4: Application Questions</div></div>
+  <section>
+    <h3>Application Questions</h3>
+    <fieldset><legend>Are you legally authorized to work in the United States?</legend>
+      <label><input type="radio" name="auth" value="1"> Yes</label><label><input type="radio" name="auth" value="0"> No</label></fieldset>
+    <label for="sp">Will you now or in the future require visa sponsorship?</label>
+    <select id="sp"><option value="">Select One</option><option>Yes</option><option>No</option></select>
+    <label for="sal">Desired salary</label><input id="sal" type="text" value="">
+    <label for="relo">Are you willing to relocate?</label>
+    <select id="relo" required><option value="">Select One</option><option>Yes</option><option>No</option></select>
+    <fieldset><legend>Have you ever been convicted of a felony?</legend>
+      <label><input type="radio" name="fel" value="1"> Yes</label><label><input type="radio" name="fel" value="0"> No</label></fieldset>
+  </section>
+  <section>
+    <h3>Voluntary Disclosures</h3>
+    <label for="g">Please select</label><select id="g"><option value="">Select One</option><option>Female</option><option>Male</option><option>I do not wish to answer</option></select>
+    <label><input type="checkbox" id="terms"> I agree to the Terms and Conditions</label>
+  </section>
+  <button type="button" data-automation-id="bottom-navigation-next-button">Next</button>
+  <button type="button" data-automation-id="submit">Submit</button>
+</div>
+</body></html>
