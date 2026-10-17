@@ -375,3 +375,22 @@ describe('sensitive checkbox group (live QA 2026-10-12)', () => {
     expect([...document.querySelectorAll<HTMLInputElement>('input')].map((i) => i.checked)).toEqual([true, false, false]);
   });
 });
+
+describe('skills pop-up left open between batches (live 2026-10-17)', () => {
+  // Narrow layouts open the skills box as a full-screen pop-up that hides the page (aria-hidden) until closed;
+  // after the first batch of 25 the next batch reported "The skills field is no longer on the page".
+  it('closes the pop-up with Escape and carries on with the next batch', async () => {
+    document.documentElement.innerHTML = `<main><div data-automation-id="applyFlowPage"><h3>My Experience</h3>
+      <div role="group"><h4>Skills</h4><div data-automation-id="formField-skills"><label for="skills--skills">Type to Add Skills</label>
+        <div data-automation-id="multiselectInputContainer"><input id="skills--skills" type="text"></div></div></div></div></main>
+      <div role="dialog" id="popup"><h2>Type to Add Skills</h2><input aria-label="Search"></div>`;
+    const fieldId = scanWorkday(document, 0).snapshot.fields.find((f) => f.semantic === 'skills')!.fieldId;
+    const page = document.querySelector('main')!;
+    page.setAttribute('aria-hidden', 'true'); // the pop-up from the previous batch is still open
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { page.removeAttribute('aria-hidden'); document.getElementById('popup')?.remove(); } });
+    const ctx: BoundPageContext = { url: new URL('https://acme.wd1.myworkdayjobs.com/en-US/External/apply'), document, binding: { platformId: 'workday', portalOrigin: 'https://acme.wd1.myworkdayjobs.com', tenantKey: 'https://acme.wd1.myworkdayjobs.com/External', applicationId: 'a1' } };
+    const r = await workday.searchSkills!(ctx, { fieldId, items: [] }, new AbortController().signal);
+    expect(r).toEqual({ ok: true, value: [] });
+    expect(page.hasAttribute('aria-hidden')).toBe(false);
+  });
+});
