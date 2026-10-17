@@ -413,3 +413,18 @@ describe('skills pop-up in narrow layouts (live 2026-10-17)', () => {
     expect(chips()).toEqual(['Git', 'SQL']);
   });
 });
+
+describe('skills field name stays the same with the pop-up open or closed (live 2026-10-17)', () => {
+  // Live: the skills box and the pop-up's box both carry data-automation-id="searchBox"; the panel's field id must not shift.
+  it('names the skills field the same either way, and never lists the pop-up box as a field', () => {
+    document.documentElement.innerHTML = `<main><div data-automation-id="applyFlowPage"><h3>My Experience</h3>
+      <div role="group"><h4>Skills</h4><div data-automation-id="formField-skills"><label for="skills--skills">Type to Add Skills</label>
+        <div data-automation-id="multiselectInputContainer"><input id="skills--skills" data-automation-id="searchBox" type="text"></div></div></div>
+      <div role="dialog"><input data-automation-id="searchBox" placeholder="Search"></div></div></main>`;
+    const withPopup = scanWorkday(document, 1).snapshot.fields;
+    document.querySelector('[role="dialog"]')!.remove();
+    const closed = scanWorkday(document, 2).snapshot.fields;
+    expect(withPopup.map((f) => f.fieldId)).toEqual(closed.map((f) => f.fieldId));
+    expect(closed.find((f) => f.semantic === 'skills')?.fieldId).toBe('skills');
+  });
+});

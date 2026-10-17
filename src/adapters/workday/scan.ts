@@ -148,6 +148,8 @@ export function scanWorkday(doc: Document, revision: number): ScanResult {
   for (const el of root.querySelectorAll(CONTROLS)) {
     if (el instanceof HTMLInputElement && SKIP_INPUT.has(el.type)) continue;
     if (!visible(el) || el.closest(SITE_CHROME)) continue;
+    // A pop-up's own search box (the narrow-layout skills picker) is not a question on the page.
+    if (aid(el) === 'searchBox' && el.closest('[role="dialog"]')) continue;
     let kind = kindOf(el);
     // One field per radio group, multiselect and month/year date pair.
     let group: Element[] = [el];
@@ -180,7 +182,9 @@ export function scanWorkday(doc: Document, revision: number): ScanResult {
     const field = formField(el);
     // Date parts and radios are named by their wrapper, not by the "Month"/"Yes" part.
     const groupLabel = question || (kind === 'radio' || (kind === 'date' && groupKey !== undefined) ? textOf(field?.querySelector(OWN_LABEL)) : '');
-    const automationId = (kind === 'date' && groupKey !== undefined ? '' : aid(el).replace(/-input$/, '')) || aid(field).replace(/^formField-/, '');
+    // "searchBox" is a generic widget id (the skills box and its pop-up both use it), so the question's own id names the field.
+    const own = kind === 'date' && groupKey !== undefined ? '' : aid(el).replace(/-input$/, '');
+    const automationId = (own === 'searchBox' ? '' : own) || aid(field).replace(/^formField-/, '');
     const label = groupLabel || labelFor(el, doc);
     const section = sectionOf(el, root);
     const recordKey = recordKeyOf(el);
