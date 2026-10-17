@@ -32,6 +32,9 @@ async function query(input: HTMLInputElement, q: string, signal: AbortSignal, ch
   return answer ?? 'timeout';
 }
 
+/** Narrow layouts open a pop-up with its own search box; typing into the hidden original box then does nothing (live 2026-10-17). */
+const typingBox = (input: HTMLInputElement) => input.ownerDocument.querySelector<HTMLInputElement>('[role="dialog"] input[data-automation-id="searchBox"]') ?? input;
+
 export async function searchSkills(input: HTMLInputElement, items: readonly SkillRequestItem[], signal: AbortSignal): Promise<SkillOutcome[]> {
   const container = input.closest('[data-automation-id="multiselectInputContainer"]') ?? input.parentElement!;
   const chips = () => [...container.querySelectorAll('[data-automation-id="selectedItem"]')].map((c) => (c.textContent ?? '').trim());
@@ -54,7 +57,7 @@ export async function searchSkills(input: HTMLInputElement, items: readonly Skil
     try {
       for (const q of wanted) {
         // Free-entry boxes (live Workday employer 5) add the typed skill on Enter and show its row ticked: clicking that row would untick it.
-        const answer = await query(input, q, signal, () => chips().filter((c) => !before.has(c) && skillKey(c) === skillKey(q)));
+        const answer = await query(typingBox(input), q, signal, () => chips().filter((c) => !before.has(c) && skillKey(c) === skillKey(q)));
         if (answer === 'timeout') { timedOut = true; continue; }
         if (typeof answer === 'object' && 'chip' in answer) { result = { name: item.name, status: 'added', option: answer.chip }; break; }
         if (answer !== 'none' && 'options' in answer) {
@@ -68,7 +71,7 @@ export async function searchSkills(input: HTMLInputElement, items: readonly Skil
             if (!chip) { clickOption(answer.options[d.pick]!); chip = await waitFor(kept, 2000, signal); }
             // Live Workday sometimes ignores a click on fresh results (a second try works), so search and click once more.
             if (!chip) {
-              const again = await query(input, q, signal);
+              const again = await query(typingBox(input), q, signal);
               const row = typeof again === 'object' && 'options' in again ? again.options.find((o) => (o.textContent ?? '').trim() === text) : undefined;
               // Rows toggle: a slow first click that landed meanwhile must not be undone.
               if (row && !kept()) { clickOption(row); chip = await waitFor(kept, 2000, signal); } else chip = kept();
@@ -83,7 +86,8 @@ export async function searchSkills(input: HTMLInputElement, items: readonly Skil
     } catch {
       result = { name: item.name, status: 'cancelled' };
     } finally {
-      if (input.value) setNativeValue(input, ''); // never leave search text behind
+      const box = typingBox(input);
+      if (box.value) setNativeValue(box, '', box !== input); // never leave search text behind (the pop-up box stays focused)
     }
     const outcome: SkillOutcome = result ?? (suggestions.size ? { name: item.name, status: 'suggestions', suggestions: [...suggestions] }
       : { name: item.name, status: timedOut ? 'timedOut' : 'notAvailable' });

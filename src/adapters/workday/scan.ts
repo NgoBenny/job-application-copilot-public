@@ -19,7 +19,11 @@ const textOf = (el: Element | null | undefined) => clean(el?.textContent);
 const aid = (el: Element | null | undefined) => el?.getAttribute('data-automation-id') ?? '';
 
 function visible(el: Element): boolean {
-  if (el.closest('[hidden], [aria-hidden="true"]')) return false;
+  if (el.closest('[hidden]')) return false;
+  const muted = el.closest('[aria-hidden="true"]');
+  // An open pop-up (e.g. the skills picker) marks the whole page aria-hidden; the fields behind it are still there (live 2026-10-17).
+  const behindPopup = !!muted?.querySelector('[data-automation-id="applyFlowPage"]') && !!el.ownerDocument.querySelector('[role="dialog"]');
+  if (muted && !behindPopup) return false;
   return typeof (el as HTMLElement).checkVisibility !== 'function' || (el as HTMLElement).checkVisibility();
 }
 

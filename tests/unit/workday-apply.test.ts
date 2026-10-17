@@ -376,45 +376,40 @@ describe('sensitive checkbox group (live QA 2026-10-12)', () => {
   });
 });
 
-describe('skills pop-up left open between batches (live 2026-10-17)', () => {
-  // Narrow layouts open the skills box as a full-screen pop-up that hides the page (aria-hidden) until closed;
-  // after the first batch of 25 the next batch reported "The skills field is no longer on the page".
-  it('closes the pop-up with Escape and carries on with the next batch', async () => {
-    document.documentElement.innerHTML = `<main><div data-automation-id="applyFlowPage"><h3>My Experience</h3>
-      <div role="group"><h4>Skills</h4><div data-automation-id="formField-skills"><label for="skills--skills">Type to Add Skills</label>
-        <div data-automation-id="multiselectInputContainer"><input id="skills--skills" type="text"></div></div></div></div></main>
-      <div role="dialog" id="popup"><h2>Type to Add Skills</h2><input aria-label="Search"></div>`;
-    const fieldId = scanWorkday(document, 0).snapshot.fields.find((f) => f.semantic === 'skills')!.fieldId;
-    const page = document.querySelector('main')!;
-    page.setAttribute('aria-hidden', 'true'); // the pop-up from the previous batch is still open
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { page.removeAttribute('aria-hidden'); document.getElementById('popup')?.remove(); } });
-    const ctx: BoundPageContext = { url: new URL('https://acme.wd1.myworkdayjobs.com/en-US/External/apply'), document, binding: { platformId: 'workday', portalOrigin: 'https://acme.wd1.myworkdayjobs.com', tenantKey: 'https://acme.wd1.myworkdayjobs.com/External', applicationId: 'a1' } };
-    const r = await workday.searchSkills!(ctx, { fieldId, items: [] }, new AbortController().signal);
-    expect(r).toEqual({ ok: true, value: [] });
-    expect(page.hasAttribute('aria-hidden')).toBe(false);
-  });
-});
+describe('skills pop-up in narrow layouts (live 2026-10-17)', () => {
+  // Live: the skills box opens as a full-screen pop-up (role=dialog) with its own search box; the page behind it is marked
+  // aria-hidden, Escape does not close it, and the typing must go to the pop-up's box (the hidden original box does nothing).
+  const PAGE = `<main><div data-automation-id="applyFlowPage"><h3>My Experience</h3>
+    <div role="group"><h4>Skills</h4><div data-automation-id="formField-skills"><label for="skills--skills">Type to Add Skills</label>
+      <div data-automation-id="multiselectInputContainer"><input id="skills--skills" type="text"></div></div></div></div></main>
+    <div role="dialog"><input data-automation-id="searchBox" placeholder="Search"><div role="listbox" data-automation-id="activeListContainer"></div><button type="button">Done</button></div>`;
+  const ctx = (): BoundPageContext => ({ url: new URL('https://acme.wd1.myworkdayjobs.com/en-US/External/apply'), document, binding: { platformId: 'workday', portalOrigin: 'https://acme.wd1.myworkdayjobs.com', tenantKey: 'https://acme.wd1.myworkdayjobs.com/External', applicationId: 'a1' } });
+  const chips = () => [...document.querySelectorAll('[data-automation-id="selectedItem"]')].map((c) => c.textContent);
 
-describe('skills pop-up at the end of a run (live 2026-10-17)', () => {
-  it('closes the pop-up it opened, so the re-scan after the run sees the page again', async () => {
-    document.documentElement.innerHTML = `<main><div data-automation-id="applyFlowPage"><h3>My Experience</h3>
-      <div role="group"><h4>Skills</h4><div data-automation-id="formField-skills"><label for="skills--skills">Type to Add Skills</label>
-        <div data-automation-id="multiselectInputContainer"><input id="skills--skills" type="text"></div></div></div></div></main>`;
-    const fieldId = scanWorkday(document, 0).snapshot.fields.find((f) => f.semantic === 'skills')!.fieldId;
-    const page = document.querySelector('main')!;
-    const input = document.getElementById('skills--skills') as HTMLInputElement;
-    // Searching opens a full-screen pop-up that hides the page until Escape; picking a row adds a chip.
-    input.addEventListener('keydown', (e) => {
-      if (e.keyCode !== 13 || !input.value) return;
-      page.setAttribute('aria-hidden', 'true');
-      document.body.insertAdjacentHTML('beforeend', '<div role="dialog" id="popup"><div role="listbox"><div role="option">Git</div></div></div>');
-      document.querySelector('#popup [role="option"]')!.addEventListener('click', () => input.insertAdjacentHTML('beforebegin', '<span data-automation-id="selectedItem">Git</span>'));
+  beforeEach(() => {
+    document.documentElement.innerHTML = PAGE;
+    document.querySelector('main')!.setAttribute('aria-hidden', 'true'); // the pop-up is open
+    const box = document.querySelector<HTMLInputElement>('[data-automation-id="searchBox"]')!;
+    const list = document.querySelector('[data-automation-id="activeListContainer"]')!;
+    const original = document.getElementById('skills--skills')!;
+    box.addEventListener('keydown', (e) => {
+      if (e.keyCode !== 13 || !box.value) return;
+      const q = box.value;
+      setTimeout(() => {
+        list.innerHTML = `<div role="option"><div data-automation-id="promptLeafNode">${q}</div></div>`;
+        list.querySelector('[data-automation-id="promptLeafNode"]')!.addEventListener('click', () => original.insertAdjacentHTML('beforebegin', `<span data-automation-id="selectedItem">${q}</span>`));
+      }, 50);
     });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { page.removeAttribute('aria-hidden'); document.getElementById('popup')?.remove(); } });
-    const ctx: BoundPageContext = { url: new URL('https://acme.wd1.myworkdayjobs.com/en-US/External/apply'), document, binding: { platformId: 'workday', portalOrigin: 'https://acme.wd1.myworkdayjobs.com', tenantKey: 'https://acme.wd1.myworkdayjobs.com/External', applicationId: 'a1' } };
-    const r = await workday.searchSkills!(ctx, { fieldId, items: [{ name: 'Git', spellings: ['Git'] }] }, new AbortController().signal);
-    expect(r.ok && r.value.map((o) => o.status)).toEqual(['added']);
-    expect(page.hasAttribute('aria-hidden')).toBe(false);
-    expect(scanWorkday(document, 1).snapshot.fields.length).toBeGreaterThan(0);
+  });
+
+  it('still sees the fields behind the open pop-up', () => {
+    expect(scanWorkday(document, 1).snapshot.fields.find((f) => f.semantic === 'skills')).toBeTruthy();
+  });
+
+  it('types into the pop-up search box and keeps adding skills while it stays open', async () => {
+    const fieldId = scanWorkday(document, 1).snapshot.fields.find((f) => f.semantic === 'skills')!.fieldId;
+    const r = await workday.searchSkills!(ctx(), { fieldId, items: [{ name: 'Git', spellings: ['Git'] }, { name: 'SQL', spellings: ['SQL'] }] }, new AbortController().signal);
+    expect(r.ok && r.value.map((o) => o.status)).toEqual(['added', 'added']);
+    expect(chips()).toEqual(['Git', 'SQL']);
   });
 });
