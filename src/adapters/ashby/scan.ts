@@ -44,7 +44,8 @@ export function scanAshby(doc: Document, revision: number): ScanResult {
   const fields: ScannedField[] = [];
   const headings = [...doc.querySelectorAll('h1, h2, h3')];
 
-  for (const entry of doc.querySelectorAll('.ashby-application-form-field-entry')) {
+  // Question blocks carry data-field-path; the equal-opportunity survey's blocks lack the field-entry class (live 2026-10-16).
+  for (const entry of [...doc.querySelectorAll('[data-field-path]')].filter((e) => e.querySelector('.ashby-application-form-question-title'))) {
     const c = controlOf(entry);
     const fieldId = entry.getAttribute('data-field-path') ?? '';
     if (!c || !fieldId || elements.has(fieldId)) continue;

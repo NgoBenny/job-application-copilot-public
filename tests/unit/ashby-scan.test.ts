@@ -58,6 +58,6 @@ describe('ashby scan (live structure 2026-10-16)', () => {
   it('never lists the resume-autofill box, the CAPTCHA or anything outside the question blocks', () => {
     expect(fields().map((f) => f.label)).not.toContain('Autofill from resume');
     expect(fields().find((f) => /recaptcha/i.test(f.fieldId))).toBeUndefined();
-    expect(fields()).toHaveLength(12);
+    expect(fields()).toHaveLength(13);
   });
 });

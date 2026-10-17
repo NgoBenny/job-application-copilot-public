@@ -53,15 +53,28 @@
       <div><textarea name="a1a1a1a1-0000-4000-8000-000000000007" id="a1a1a1a1-0000-4000-8000-000000000007"></textarea></div>
     </div>
 
+  </div>
+  <!-- Live: the equal-opportunity survey is its own container, and its blocks lack the field-entry class. -->
+  <div class="ashby-survey-form-container"><div class="ashby-application-form-container"><div class="ashby-application-form-section-container">
     <h3>U.S. Equal Opportunity Employment Information</h3>
-    <div class="ashby-application-form-field-entry" data-field-path="_systemfield_eeoc_gender">
+    <div data-field-path="_systemfield_eeoc_gender">
       <fieldset class="ashby-application-form-input-radio-group"><label class="ashby-application-form-question-title" for="_systemfield_eeoc_gender">Gender</label>
         <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__gender-0" name="eeo__systemfield_eeoc_gender"><label for="eeo__gender-0">Male</label></div>
         <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__gender-1" name="eeo__systemfield_eeoc_gender"><label for="eeo__gender-1">Female</label></div>
         <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__gender-2" name="eeo__systemfield_eeoc_gender"><label for="eeo__gender-2">Decline to self-identify</label></div>
       </fieldset>
     </div>
-    <div class="ashby-application-form-field-entry" data-field-path="_systemfield_eeoc_veteran_status">
+    <div data-field-path="_systemfield_eeoc_race">
+      <fieldset class="ashby-application-form-input-radio-group"><label class="ashby-application-form-question-title" for="_systemfield_eeoc_race">Race</label>
+        <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__race-0" name="eeo__systemfield_eeoc_race"><label for="eeo__race-0">Hispanic or Latino</label></div>
+        <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__race-1" name="eeo__systemfield_eeoc_race"><label for="eeo__race-1">White (Not Hispanic or Latino)</label></div>
+        <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__race-2" name="eeo__systemfield_eeoc_race"><label for="eeo__race-2">Black or African American (Not Hispanic or Latino)</label></div>
+        <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__race-3" name="eeo__systemfield_eeoc_race"><label for="eeo__race-3">Asian (Not Hispanic or Latino)</label></div>
+        <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__race-4" name="eeo__systemfield_eeoc_race"><label for="eeo__race-4">Two or More Races (Not Hispanic or Latino)</label></div>
+        <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__race-5" name="eeo__systemfield_eeoc_race"><label for="eeo__race-5">Decline to self-identify</label></div>
+      </fieldset>
+    </div>
+    <div data-field-path="_systemfield_eeoc_veteran_status">
       <fieldset class="ashby-application-form-input-radio-group"><label class="ashby-application-form-question-title" for="_systemfield_eeoc_veteran_status">Veteran Status</label>
         <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__vet-0" name="eeo__systemfield_eeoc_veteran_status"><label for="eeo__vet-0">I identify as one or more of the classifications of protected veteran</label></div>
         <div class="ashby-application-form-input-radio-group-option"><input type="radio" id="eeo__vet-1" name="eeo__systemfield_eeoc_veteran_status"><label for="eeo__vet-1">I am not a protected veteran</label></div>
@@ -69,6 +82,8 @@
       </fieldset>
     </div>
 
+    </div></div></div>
+  <div class="ashby-application-form-container">
     <textarea id="g-recaptcha-response-100000" name="g-recaptcha-response" class="grecaptcha-badge" style="display:none"></textarea>
     <button type="submit" class="ashby-application-form-submit-button">Submit Application</button>
   </div>

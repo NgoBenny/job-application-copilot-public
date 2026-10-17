@@ -92,6 +92,13 @@ describe('ashby fill (live structure 2026-10-16)', { timeout: 30_000 }, () => {
     expect(document.querySelector<HTMLInputElement>('#eeo__vet-1')!.checked).toBe(true);
   });
 
+  it('fills the EEO survey only from exact dashboard answers, with a shared tag ignored (live 2026-10-16)', async () => {
+    const answers = { memories: [], sensitive: [{ topic: 'race' as const, answer: 'Asian' }, { topic: 'veteran' as const, answer: 'I am not a protected veteran' }], ctx: { tenantKey: 't', applicationId: 'a1', employer: 'Acme', jobTitle: 'Intern' } };
+    expect(await fill(['Race', 'Veteran Status'], answers)).toEqual({ Race: 'verified', 'Veteran Status': 'verified' });
+    expect(document.querySelector<HTMLInputElement>('#eeo__race-3')!.checked).toBe(true);
+    expect(document.querySelector<HTMLInputElement>('#eeo__vet-1')!.checked).toBe(true);
+  });
+
   it('never presses Submit Application, whatever the plan says', async () => {
     let submitted = 0;
     document.querySelector('.ashby-application-form-submit-button')!.addEventListener('click', () => submitted++);
