@@ -1,26 +1,50 @@
 # Job Application Copilot
 
-A local-first Chrome extension that helps you fill job applications from your own verified profile. You review every change, and it **never submits anything**.
+A Chrome extension that proposes job-application answers from a verified profile. You review the changes before it fills them. Navigation, uploads, signatures, and submission stay manual.
 
-It supports **Workday** candidate portals and **Greenhouse** hosted job boards (`job-boards.greenhouse.io`; Greenhouse forms embedded on employer websites aren't supported yet). Other application systems can be added (see [docs/adding-an-adapter.md](docs/adding-an-adapter.md)).
+It runs locally, with no backend, analytics, or AI service. The master profile stays separate from tailored resume imports and individual application records.
 
-> **Status: experimental.** Checked live on four Workday employers and three Greenhouse boards (see [docs/qa/](docs/qa/)). Everything here is tested against synthetic Workday-like pages, not real employer portals. Live behaviour varies by employer. Until manual results are recorded in [docs/implementation-progress.md](docs/implementation-progress.md), treat it as a careful assistant and check each step yourself.
+## Platform support and status
+
+| Platform | Implemented scope | Evidence and limits |
+| --- | --- | --- |
+| Workday | Candidate portals, step scanning, approved filling, experience repair, and verified-list skill search | Recorded manual QA on selected employers and synthetic regression fixtures. Custom domains and employer-specific controls can remain unsupported. |
+| Greenhouse | Hosted boards on `job-boards.greenhouse.io` | Recorded QA on selected boards. Employer-site embedded forms are not supported. |
+| Ashby | Application pages on `jobs.ashbyhq.com` | Adapter and synthetic tests, plus a recorded application QA session. Overview pages do not contain the supported form. Free-text sensitive answers remain manual. |
+
+The project is experimental. [Redacted QA notes](docs/qa/) record observed failures and fixes. Automated tests reproduce selected cases on synthetic pages; they are not exhaustive employer compatibility checks. The [implementation ledger](docs/implementation-progress.md) includes historical phase notes, some of which predate the later live QA.
+
+“Filled and verified” means the page shows the expected value after the write. It cannot confirm a portal's internal store or successful submission. Ashby exposed a case where visible answers had not reached that store; the adapter now spaces out writes, with a regression fixture reproducing the race.
+
+## Architecture
+
+The write path is scan, propose, preview, approve, revalidate, apply, then verify.
+
+| Boundary | Responsibility |
+| --- | --- |
+| Domain | Validated records, normalization, matching, and answer policy |
+| Platform adapters | Site detection and platform-specific scan/fill/verify controls |
+| Review interface | Proposed value, current value, source, reason, and approval |
+| Injected page script | Only the approved fill plan, not the complete master profile |
+| Service worker | Local storage ownership, validated messages, revisions, and migrations |
+
+The release requests `activeTab`, `scripting`, `storage`, and `sidePanel`, with no static host permissions. A site is accessed only after activation. See [architecture](docs/architecture.md) and the [adapter guide](docs/adding-an-adapter.md).
 
 ## What it does
 
-- **Keeps one verified master profile** (contact, links, education, jobs, projects, skills) and a separate record for each application.
-- **Imports your tailored resume** as a PDF, a companion JSON from your resume chat, or both. It reads them on your device, flags mismatches, and shows how each differs from your master profile. Your master profile stays the source of truth.
-- **Scans each Workday step without changing it,** then proposes fills: only fields that differ from your profile, each with its source and reason.
-- **Repairs My Experience:** matches Workday's parsed entries to your real jobs and schools by identity, never by position. It fixes dates and dropdowns, and adds missing entries only when you approve.
-- **Adds skills** only from your verified list. It searches Workday's skills box, picks exact matches, offers close options for your approval, and tells you honestly when a skill isn't available.
-- **Remembers answers** only when you click Remember, scoped to all employers, one employer or one job. It never reuses an answer for reversed wording.
-- **Sensitive answers** (demographics, work authorization, sponsorship, conviction) are filled only from answers you type in the dashboard. Each one needs your approval, only when the question clearly names the topic, and only into a choice whose text exactly matches what you typed.
-- **Helps with accounts:** it recognizes sign-in and registration pages and keeps an account list (email and status only), but never types or reads passwords, codes or Google sign-in.
-- **Respects your edits:** a value you changed is never overwritten, and every write is checked after the page rerenders.
+- Keeps one verified master profile (contact, links, education, jobs, projects, skills) and a separate record for each application.
+- Imports your tailored resume as a PDF, a companion JSON from your resume chat, or both. It reads them on your device, flags mismatches, and shows how each differs from your master profile. Your master profile stays the source of truth.
+- Scans each Workday step without changing it, then proposes fills: only fields that differ from your profile, each with its source and reason.
+- Repairs My Experience: matches Workday's parsed entries to your real jobs and schools by identity, never by position. It fixes dates and dropdowns, and adds missing entries only when you approve.
+- Adds skills only from your verified list. It searches Workday's skills box, picks exact matches, offers close options for your approval, and tells you honestly when a skill isn't available.
+- Remembers answers only when you click Remember, scoped to all employers, one employer or one job. It never reuses an answer for reversed wording.
+- Sensitive answers (demographics, work authorization, sponsorship, conviction) are filled only from answers you type in the dashboard. Each one needs your approval, only when the question clearly names the topic, and only into a choice whose text exactly matches what you typed.
+- Helps with accounts: it recognizes sign-in and registration pages and keeps an account list (email and status only), but never types or reads passwords, codes or Google sign-in.
+- Respects your edits: the write path rechecks field identity and current value before applying a proposal, then checks the displayed result after the page rerenders. A stale plan or detected user edit is refused.
 
 ## What it never does
 
-Click Next or Submit. Accept terms or sign attestations. Create accounts or sign in. Touch passwords, one-time codes, CAPTCHA, cookies or SSO. Upload files. Invent skills, dates or experience. Send your data anywhere: there's no server, no analytics and no AI service.
+The extension does not click Next or Submit, accept terms, sign attestations, create accounts, sign in, or upload files. Passwords, one-time codes, CAPTCHA, cookies, and SSO stay outside its workflow. It does not infer skills, dates, or experience from a job description or send profile data to a backend.
 
 ## Install (from source)
 
@@ -43,7 +67,7 @@ npm run build
 
 1. **Dashboard → Master profile:** enter your verified details.
 2. **Dashboard → Applications → New application:** add the tailored PDF and/or JSON (see [docs/chatgpt-resume-handoff.md](docs/chatgpt-resume-handoff.md)), review the comparison, and save.
-3. Open the employer's Workday application. Use Workday's own "Autofill with Resume" and upload your PDF yourself.
+3. Open a supported application page. On Workday, use its own "Autofill with Resume" if available. Upload the PDF yourself on every platform.
 4. Click the extension button, choose the application, and click **Activate on this tab**. Then click **Open step review**.
 5. **Scan this step**, read the proposed changes, approve what's right (or "Approve all safe"), and click **Fill**. Each field reports "Filled and verified" or why it wasn't filled.
 6. Answer anything listed under "You answer these" yourself. Click Next yourself; the panel re-scans the new step.
@@ -63,7 +87,8 @@ Permissions: `activeTab` (only the tab you activate, until it navigates away), `
 npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e
 ```
 
-- `npm run test:e2e` builds a test-only variant into `.output/chrome-mv3-e2e` (it grants the synthetic fixture hosts) and drives it in Playwright's Chromium. The release build never contains those grants, and a test checks this.
+- `npm run test:e2e` builds a test-only variant into `.output/chrome-mv3-e2e` (it grants the synthetic fixture hosts) and drives it in Playwright's Chromium. The release build excludes those grants, with a manifest regression check.
+- Recent live findings cover Workday skills pop-ups with their own search boxes and Ashby's form-store update timing. Review [known limitations](docs/known-limitations.md) alongside the newer QA notes; older blanket “untested live” statements predate recorded sessions.
 - Architecture: [docs/architecture.md](docs/architecture.md). Limitations: [docs/known-limitations.md](docs/known-limitations.md). Conventions for contributors and coding agents: [AGENTS.md](AGENTS.md).
 - Regenerate fixture PDFs: `node scripts/make-fixture-pdfs.ts`.
 
