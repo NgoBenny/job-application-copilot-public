@@ -24,11 +24,14 @@ export const workday: ApplicationAdapter = {
   observeChanges: fill.observeChanges,
   async searchSkills(ctx, req, signal) {
     const find = () => { const { snapshot, elements } = scanWorkday(ctx.document, fill.revision()); return { f: snapshot.fields.find((x) => x.fieldId === req.fieldId), el: elements.get(req.fieldId) }; };
-    let { f, el } = find();
-    // Narrow layouts leave the skills pop-up open after a batch, hiding the page (aria-hidden) from the scan; Escape closes it
-    // and the chosen skills stay (live 2026-10-17: the second batch said the field was gone).
-    if (!f) { pressKey(ctx.document.activeElement ?? ctx.document.body, 'Escape'); await sleep(500, signal).catch(() => undefined); ({ f, el } = find()); }
+    // Narrow layouts open the skills box as a pop-up that hides the page (aria-hidden) and stays open; Escape closes it and the
+    // chosen skills stay (live 2026-10-17). Closed before a batch (else "field gone") and after it (else the re-scan sees 0 fields).
+    const closePopup = async () => { if (!find().f) { pressKey(ctx.document.activeElement ?? ctx.document.body, 'Escape'); await sleep(500, signal).catch(() => undefined); } };
+    await closePopup();
+    const { f, el } = find();
     if (!f || !el || f.kind !== 'multiselect' || f.semantic !== 'skills' || f.protection || f.disabled) return { ok: false, outcome: 'stale', reason: 'The skills field is no longer on the page. Scan again.' };
-    return { ok: true, value: await searchSkills(el as HTMLInputElement, req.items, signal) };
+    const outcomes = await searchSkills(el as HTMLInputElement, req.items, signal);
+    await closePopup();
+    return { ok: true, value: outcomes };
   },
 };
