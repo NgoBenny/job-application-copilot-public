@@ -68,7 +68,7 @@ export const MasterProfile = z.strictObject({
 /** One job application: employer/job scope, its own tailored resume and selections. Never changes the master profile. */
 export const Application = z.strictObject({
   id,
-  platformId: z.enum(['workday', 'greenhouse']), // a new application starts as workday; activation records the real one
+  platformId: z.enum(['workday', 'greenhouse', 'ashby']), // a new application starts as workday; activation records the real one
   employerLabel: text(),
   jobTitle: text(),
   jobUrl: SafeUrl,

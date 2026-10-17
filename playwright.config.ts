@@ -6,5 +6,6 @@ export default defineConfig({
   timeout: 60_000,
   reporter: 'list',
   use: { trace: 'retain-on-failure' },
-  webServer: { command: 'node tests/fixture-server.mjs', url: 'http://127.0.0.1:4173/index.html', reuseExistingServer: !process.env.CI },
+  // Waits on the HTTPS port (opened last), so a reused older server without it is not mistaken for ready.
+  webServer: { command: 'node tests/fixture-server.mjs', url: 'https://127.0.0.1:4174/index.html', ignoreHTTPSErrors: true, reuseExistingServer: !process.env.CI },
 });

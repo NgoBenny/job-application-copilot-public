@@ -9,7 +9,7 @@ const noAdapterImports = {
 };
 
 export default tseslint.config(
-  { ignores: ['.output/**', '.wxt/**', 'node_modules/**', 'test-results/**', 'playwright-report/**'] },
+  { ignores: ['.output/**', '.wxt/**', 'node_modules/**', 'test-results/**', 'playwright-report/**', 'course/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { languageOptions: { globals: { ...globals.browser, chrome: 'readonly' } } },

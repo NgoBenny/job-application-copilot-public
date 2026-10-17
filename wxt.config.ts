@@ -6,7 +6,7 @@ export const RELEASE_PERMISSIONS = ['activeTab', 'scripting', 'storage', 'sidePa
 
 // Test-only: `--mode e2e` grants the fixture origins (Workday hostnames are mapped to the local
 // fixture server by Playwright) so tests can inject without a real toolbar click.
-export const E2E_HOSTS = ['http://127.0.0.1:4173/*', 'http://*.myworkdayjobs.com/*', 'http://*.myworkdaysite.com/*', 'http://job-boards.greenhouse.io/*'];
+export const E2E_HOSTS = ['http://127.0.0.1:4173/*', 'http://*.myworkdayjobs.com/*', 'http://*.myworkdaysite.com/*', 'http://job-boards.greenhouse.io/*', 'https://jobs.ashbyhq.com/*'];
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],

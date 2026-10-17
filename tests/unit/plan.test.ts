@@ -16,6 +16,13 @@ function snap(path: string): ScanSnapshot {
 const field = (over: Partial<ScannedField>): ScannedField => ({ fieldId: 'f', kind: 'text', label: 'L', section: '', required: false, disabled: false, value: '', ...over });
 const s = (fields: ScannedField[]): ScanSnapshot => ({ stepId: 'x', stepLabel: 'X', revision: 1, fields, errors: [] });
 
+describe('ashby-style values (2026-10-16)', () => {
+  it('proposes "First Last" for a single full-name box', () => {
+    const page = s([field({ fieldId: 'n', label: 'Name', semantic: 'contact.fullName' })]);
+    expect(propose(page, profile).proposals[0]?.proposed).toBe(`${profile.contact.firstName} ${profile.contact.lastName}`.trim());
+  });
+});
+
 describe('greenhouse-style values (2026-10-12)', () => {
   const edu = (over: Partial<ScannedField>) => field({ recordKey: 'education-1', section: 'Education', ...over });
   const page = s([

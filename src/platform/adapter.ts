@@ -2,7 +2,7 @@
 // Adapters never receive the profile: they get a sanitized page context and an approved plan.
 import type { Protection } from '../domain/policy';
 
-export type PlatformId = 'workday' | 'greenhouse' | 'test-fake';
+export type PlatformId = 'workday' | 'greenhouse' | 'ashby' | 'test-fake';
 
 export type Capability = 'skillSearch' | 'repeaterAdd' | 'accountDetect' | 'uploadAssist' | 'confirmationDetect';
 

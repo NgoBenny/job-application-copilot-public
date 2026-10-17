@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { ashby } from '../../src/adapters/ashby';
 import { greenhouse } from '../../src/adapters/greenhouse';
 import { workday } from '../../src/adapters/workday';
 // @ts-expect-error plain JS fixture helper
@@ -8,7 +9,14 @@ import { adapterContract } from '../contract/kit';
 import { fakeAdapter } from '../contract/fake-adapter';
 import { expect, it } from 'vitest';
 
-it('every registered adapter has a contract fixture below', () => expect(adapters.map((a) => a.id)).toEqual(['workday', 'greenhouse']));
+it('every registered adapter has a contract fixture below', () => expect(adapters.map((a) => a.id)).toEqual(['workday', 'greenhouse', 'ashby']));
+
+adapterContract('ashby', ashby, {
+  url: 'https://jobs.ashbyhq.com/acme/0f1e2d3c-0000-4000-8000-000000000001/application',
+  html: readFileSync('tests/fixtures/ashby/acme/0f1e2d3c-0000-4000-8000-000000000001/application.html', 'utf8').replace(/<script[\s\S]*?<\/script>/g, ''),
+  fillableLabel: 'Email',
+  protectedLabel: 'Veteran Status',
+});
 
 // The Greenhouse fixture's dropdowns are built by a script; build them once, then hand the kit plain HTML.
 const ghDoc = new DOMParser().parseFromString(readFileSync('tests/fixtures/greenhouse/acme/jobs/1001.html', 'utf8').replace(/<script[\s\S]*?<\/script>/g, ''), 'text/html');

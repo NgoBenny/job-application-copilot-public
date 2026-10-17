@@ -10,10 +10,12 @@ export const FIXTURES = 'http://127.0.0.1:4173';
 export async function launchExtension(userDataDir = mkdtempSync(join(tmpdir(), 'copilot-e2e-'))) {
   const context = await chromium.launchPersistentContext(userDataDir, {
     channel: 'chromium',
+    // Only for the HTTPS fixture server's self-signed certificate (see tests/fixture-server.mjs).
+    ignoreHTTPSErrors: true,
     args: [
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,
-      '--host-resolver-rules=MAP *.myworkdayjobs.com 127.0.0.1:4173, MAP *.myworkdaysite.com 127.0.0.1:4173, MAP job-boards.greenhouse.io 127.0.0.1:4173',
+      '--host-resolver-rules=MAP *.myworkdayjobs.com 127.0.0.1:4173, MAP *.myworkdaysite.com 127.0.0.1:4173, MAP job-boards.greenhouse.io 127.0.0.1:4173, MAP jobs.ashbyhq.com 127.0.0.1:4174',
     ],
   });
   const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));

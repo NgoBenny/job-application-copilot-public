@@ -5,7 +5,7 @@ import type { Store } from '../domain/schemas';
 const tabId = z.number().int().nonnegative();
 
 export const BindingSchema = z.strictObject({
-  platformId: z.enum(['workday', 'greenhouse', 'test-fake']),
+  platformId: z.enum(['workday', 'greenhouse', 'ashby', 'test-fake']),
   portalOrigin: z.string().max(300),
   tenantKey: z.string().max(300),
   applicationId: z.string().min(1).max(64),

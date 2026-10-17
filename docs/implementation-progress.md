@@ -175,6 +175,12 @@ Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm
 - [x] Phase 4: E2E on a synthetic board (`tests/e2e/greenhouse.spec.ts`: read-only scan, approved fill incl. dropdowns, user edits kept, acknowledgement and Submit untouched)
 - [x] Phase 5: live QA on the user's Greenhouse applications: Greenhouse board 1 (`docs/qa/2026-10-12-greenhouse-board-1.md`), Greenhouse board 2 (`docs/qa/2026-10-13-greenhouse-board-2.md`), Greenhouse board 3 (`docs/qa/2026-10-13-greenhouse-board-3.md`); 8 live bugs found and fixed. Greenhouse board 4's posting closed before testing. Supported: hosted job boards (`job-boards.greenhouse.io`); embedded employer-site forms are not.
 
+### Ashby support (2026-10-16, user request)
+- [x] Tests first: synthetic Ashby form copying a live jobs.ashbyhq.com structure (Yes/No buttons with aria-pressed, place search with an aria-controls list); detection, scan, fill, contract and e2e tests written and run red (19 failing assertions)
+- [x] Plumbing (`ashby` platform id, registry, e2e host over HTTPS because ashbyhq.com is on Chrome's HSTS list) and adapter (`src/adapters/ashby/`, shared fill loop); "full name" profile value; all green
+- [x] Reviews: location write restores the previous value on failure, ignores a stale list, phone label rule widened, only `/application` pages count
+- [ ] Live QA with the user on an Ashby application before claiming compatibility
+
 ### Live QA log
 | Date | Chrome | Employer (redacted) | Steps | Result |
 |---|---|---|---|---|

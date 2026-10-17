@@ -84,6 +84,8 @@ function dateFor(field: ScannedField, value: string): string {
 function contactValue(p: MasterProfile, semantic: string): string | undefined {
   const [group, key] = semantic.split('.') as [string, string];
   // "Location (City)" lists places as "City, State, Country": city and region together pin one down.
+  // One box for the whole name (Ashby): "First Last".
+  if (group === 'contact' && key === 'fullName') return [p.contact.firstName, p.contact.lastName].filter(Boolean).join(' ') || undefined;
   if (group === 'contact' && key === 'location') return p.contact.city ? [p.contact.city, p.contact.region].filter(Boolean).join(', ') : undefined;
   if (group === 'contact') return (p.contact as Record<string, string>)[key];
   if (group === 'links') return p.links.find((l) => l.kind === key)?.url;
