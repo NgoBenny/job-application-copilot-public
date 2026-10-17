@@ -4,7 +4,24 @@
 // - The location box is a combobox: typing shows a list (appended to <body>, linked by aria-controls) a moment later;
 //   clicking a row puts its full text in the box and closes the list.
 
+// - Text answers are saved into one form-wide store when a box is left (focusout), from a snapshot of the store taken at
+//   the last redraw (~50 ms after each save). Two saves before that redraw lose the first one: the box still shows the
+//   value, but the store (what Submit checks; exposed here as data-saved on <body>) misses it (live 2026-10-16, "Email").
+function wireStore(doc) {
+  if (doc.body.dataset.storeWired) return;
+  doc.body.dataset.storeWired = 'true';
+  let store = {}, snapshot = {};
+  doc.addEventListener('focusout', (e) => {
+    const box = e.target;
+    if (!box.matches?.('.ashby-application-form-field-entry input:not([type=file]):not([type=checkbox]):not([role=combobox]), .ashby-application-form-field-entry textarea')) return;
+    store = { ...snapshot, [box.id]: box.value };
+    doc.body.dataset.saved = JSON.stringify(store);
+    setTimeout(() => { snapshot = store; }, 50);
+  }, true);
+}
+
 export function install(doc = document) {
+  wireStore(doc);
   for (const group of doc.querySelectorAll('.ashby-application-form-input-yesno:not([data-wired])')) {
     group.dataset.wired = 'true';
     const box = group.querySelector('input[type="checkbox"]');
