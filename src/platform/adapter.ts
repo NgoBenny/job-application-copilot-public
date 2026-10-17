@@ -4,8 +4,6 @@ import type { Protection } from '../domain/policy';
 
 export type PlatformId = 'workday' | 'greenhouse' | 'ashby' | 'test-fake';
 
-export type Capability = 'skillSearch' | 'repeaterAdd' | 'accountDetect' | 'uploadAssist' | 'confirmationDetect';
-
 export type Outcome = 'verified' | 'skipped' | 'stale' | 'unsupported' | 'failed' | 'cancelled' | 'timedOut';
 
 export type AdapterResult<T> = { ok: true; value: T } | { ok: false; outcome: Exclude<Outcome, 'verified'>; reason: string };
@@ -147,7 +145,6 @@ export interface SkillOutcome {
 
 export interface ApplicationAdapter {
   readonly id: PlatformId;
-  readonly capabilities: ReadonlySet<Capability>;
   detect(ctx: PageContext): Promise<AdapterResult<Detection>>;
   scan(ctx: BoundPageContext, signal: AbortSignal): Promise<AdapterResult<ScanSnapshot>>;
   apply(ctx: BoundPageContext, plan: ApprovedFillPlan, signal: AbortSignal): Promise<AdapterResult<ApplyReport>>;

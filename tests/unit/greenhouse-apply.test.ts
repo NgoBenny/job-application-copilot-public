@@ -50,6 +50,15 @@ describe('greenhouse fill (live structure 2026-10-12)', { timeout: 30_000 }, () 
     expect(shown('candidate-location')).toBe('Springfield, Illinois, United States');
   });
 
+  it('fills a plain <select> question and reads back the chosen text, not its value', async () => {
+    document.querySelector('form#application-form')!.insertAdjacentHTML('beforeend', '<label for="q-sel">Preferred office</label><select id="q-sel"><option value="">Select...</option><option value="11">Remote</option><option value="12">Chicago</option></select>');
+    const sel = document.getElementById('q-sel') as HTMLSelectElement;
+    expect(await writeField(sel, 'select', 'Chicago', never)).toEqual({ ok: true });
+    expect(sel.value).toBe('12');
+    expect(scanGreenhouse(document, 0).snapshot.fields.find((f) => f.label === 'Preferred office')).toMatchObject({ kind: 'select', value: 'Chicago' });
+    expect(await writeField(sel, 'select', 'Boston', never)).toMatchObject({ ok: false, outcome: 'unsupported' });
+  });
+
   it('leaves a searched list alone when several places match', async () => {
     const r = await writeField(document.getElementById('candidate-location')!, 'dropdown', 'Springfield', never);
     expect(r).toEqual({ ok: false, outcome: 'unsupported', reason: 'Several choices could match; pick one yourself.' });

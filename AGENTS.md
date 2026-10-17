@@ -25,6 +25,7 @@ src/features/          use cases + React UI per feature
 src/platform/          ApplicationAdapter contract, registry (composition root), contract-test kit
 src/adapters/workday/  Workday-only code
 src/adapters/greenhouse/  Greenhouse hosted job-boards code (live-validated on 3 boards, 2026-10-13)
+src/adapters/ashby/    Ashby hosted job-boards code (jobs.ashbyhq.com, first live board 2026-10-16)
 src/adapters/shared/   page helpers shared by adapters (waits, React-safe writes, keys, lists)
 src/browser/           chrome.* wrappers: storage + migrations, messaging, permissions, injection
 src/ui/                shared React UI

@@ -14,7 +14,6 @@ const fill = fillLifecycle({
 
 export const workday: ApplicationAdapter = {
   id: 'workday',
-  capabilities: new Set(['repeaterAdd', 'skillSearch', 'accountDetect', 'confirmationDetect']),
   async detect(ctx) {
     return { ok: true, value: detectWorkday(ctx.url, ctx.document) };
   },

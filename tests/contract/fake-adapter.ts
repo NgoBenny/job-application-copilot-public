@@ -19,7 +19,6 @@ function scanFake(doc: Document): ScannedField[] {
 
 export const fakeAdapter: ApplicationAdapter = {
   id: 'test-fake',
-  capabilities: new Set(),
   async detect(ctx) {
     return { ok: true, value: ctx.url.hostname === 'jobs.fake.test' ? { status: 'supported', tenantKey: ctx.url.origin, evidence: ['fake'] } : { status: 'unsupported', evidence: [] } };
   },

@@ -17,11 +17,13 @@ src/domain/     pure TS: schemas + migrations, policy (protected fields), plan (
                 skills, options, dates, text, resume parsing/reconcile
 src/platform/   ApplicationAdapter contract, registry (the only place adapters are imported)
 src/adapters/workday/  detection + tenant key, scan, semantics, page kind, controls, skills search
+src/adapters/greenhouse/, src/adapters/ashby/  detection, scan, controls per hosted job board
+src/adapters/shared/   fill loop (scan/apply/verify/observe) and page helpers shared by adapters
 src/browser/    messages (Zod), router, store-service, tab-service
 src/features/   React UI per feature
 ```
 
-An ESLint rule (`no-restricted-imports`) blocks adapter imports anywhere except `src/platform/registry.ts`. The contract kit (`tests/contract`) runs against Workday and a test-only plain-HTML adapter, which proves the engine has no Workday dependency.
+An ESLint rule (`no-restricted-imports`) blocks adapter imports anywhere except `src/platform/registry.ts`. The contract kit (`tests/contract`) runs against Workday, Greenhouse, Ashby and a test-only plain-HTML adapter, which proves the engine has no site dependency.
 
 ## Data flow for one step
 

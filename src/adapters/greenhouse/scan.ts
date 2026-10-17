@@ -94,6 +94,7 @@ export function scanGreenhouse(doc: Document, revision: number): ScanResult {
     const read = () => kind === 'dropdown' ? dropdownValue(el)
       : kind === 'radio' ? group.filter((g) => g.checked).map((g) => clean(g.labels?.[0]?.textContent)).join('; ')
       : kind === 'checkbox' ? String(input.checked)
+      : kind === 'select' ? ((el as HTMLSelectElement).value ? clean((el as HTMLSelectElement).selectedOptions[0]?.text) : '')
       : kind === 'file' ? '' : (el as HTMLInputElement).value;
     fields.push({
       fieldId,

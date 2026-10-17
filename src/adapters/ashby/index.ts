@@ -22,7 +22,6 @@ const fill = fillLifecycle({
 
 export const ashby: ApplicationAdapter = {
   id: 'ashby',
-  capabilities: new Set(),
   async detect(ctx) {
     return { ok: true, value: detectAshby(ctx.url, ctx.document) };
   },

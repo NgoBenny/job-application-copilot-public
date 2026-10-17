@@ -181,6 +181,12 @@ Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm
 - [x] Reviews: location write restores the previous value on failure, ignores a stale list, phone label rule widened, only `/application` pages count
 - [ ] Live QA with the user on an Ashby application before claiming compatibility
 
+### Dead-code and test audit (2026-10-17, user request)
+- [x] Bug: Greenhouse native `<select>` questions were scanned but never filled (no write case) and read back the option value, not its text; test first, fixed
+- [x] Removed after proving no callers: `detectAdapter`, the `tab/deactivate` message, the unread adapter `capabilities` field
+- [x] Tests: honest name for the contract kit's protected-field test, merged an Ashby duplicate, stopped a skills widget timer leaking into later tests, made the slow-click test independent of timing (mutation-checked), folded a duplicate pop-up test
+- Kept on purpose: `ALIAS_VERSION` (the versioned alias map is a Phase 5 requirement); write-only stored fields (`Application.skillSelections`, `platformId`, `portalOrigin`, `createdAt`, `updatedAt`, `AccountRecord.updatedAt`) because removing them needs a storage migration for no user benefit
+
 ### Live QA log
 | Date | Chrome | Employer (redacted) | Steps | Result |
 |---|---|---|---|---|

@@ -38,13 +38,9 @@ async function fill(labels: string[], answers?: AnswerSources) {
 describe('ashby fill (live structure 2026-10-16)', { timeout: 30_000 }, () => {
   beforeEach(() => { document.documentElement.innerHTML = HTML; install(document); });
 
-  it('fills the full name, email, phone and LinkedIn, then verifies them', async () => {
+  it('fills full name, email and phone, verifies them, and gives each answer time to reach the form-wide store (live 2026-10-16: Email lost)', async () => {
     expect(await fill(['Name', 'Email', 'Phone Number'])).toEqual({ Name: 'verified', Email: 'verified', 'Phone Number': 'verified' });
     expect((document.getElementById('_systemfield_name') as HTMLInputElement).value).toBe(`${profile().contact.firstName} Example`);
-  });
-
-  it('gives each text answer time to reach the form-wide store before the next one (live 2026-10-16: Email lost)', async () => {
-    expect(await fill(['Name', 'Email', 'Phone Number'])).toEqual({ Name: 'verified', Email: 'verified', 'Phone Number': 'verified' });
     await new Promise((r) => setTimeout(r, 100));
     const saved = JSON.parse(document.body.dataset.saved ?? '{}');
     expect(Object.keys(saved).sort()).toEqual(['_systemfield_email', '_systemfield_name', 'a1a1a1a1-0000-4000-8000-000000000001']);

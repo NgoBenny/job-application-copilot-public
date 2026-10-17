@@ -90,11 +90,6 @@ export async function cancel(tabId: number): Promise<ResponseFor<'tab/cancel'>> 
   return { ok: true };
 }
 
-export async function deactivate(tabId: number): Promise<ResponseFor<'tab/deactivate'>> {
-  await clearBinding(tabId);
-  return { ok: true };
-}
-
 export function listenTabs() {
   chrome.tabs.onRemoved.addListener((tabId) => void clearBinding(tabId));
   // A cross-origin navigation ends the binding; same-origin SPA changes are re-checked by the injected script on every scan.

@@ -46,7 +46,7 @@ export function adapterContract(name: string, adapter: ApplicationAdapter, fixtu
       expect(events).toEqual([]);
     });
 
-    it('never reads a protected value and never proposes for it', async () => {
+    it('tags a protected field and gives it no meaning to fill from', async () => {
       load();
       const s = await scan(await ctx());
       const f = s.fields.find((x) => x.label === fixture.protectedLabel)!;

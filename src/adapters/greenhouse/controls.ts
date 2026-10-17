@@ -88,6 +88,14 @@ export async function writeField(el: Element, kind: FieldKind, value: string, si
         if (!boxes[i]!.checked) boxes[i]!.click();
         return { ok: true };
       }
+      case 'select': {
+        const s = el as HTMLSelectElement;
+        const i = pick([...s.options].map((o) => o.text.trim()), value, exact);
+        if (typeof i !== 'number' || i < 0) return { ok: false, outcome: 'unsupported', reason: i === 'ambiguous' ? 'Several choices could match; pick one yourself.' : 'No matching choice.' };
+        s.selectedIndex = i;
+        s.dispatchEvent(new Event('change', { bubbles: true }));
+        return { ok: true };
+      }
       case 'checkbox': {
         const box = el as HTMLInputElement;
         if (box.checked !== (value === 'true')) box.click();

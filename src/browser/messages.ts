@@ -49,7 +49,6 @@ export const Request = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('store/wipe') }),
   z.strictObject({ type: z.literal('tab/status'), tabId }),
   z.strictObject({ type: z.literal('tab/activate'), tabId, applicationId: z.string().min(1).max(64) }),
-  z.strictObject({ type: z.literal('tab/deactivate'), tabId }),
   z.strictObject({ type: z.literal('tab/scan'), tabId }),
   z.strictObject({ type: z.literal('tab/fill'), tabId, plan: PlanSchema }),
   z.strictObject({ type: z.literal('tab/cancel'), tabId }),
@@ -67,7 +66,6 @@ type Payload = {
   'store/wipe': { store: Store };
   'tab/status': TabStatus;
   'tab/activate': TabStatus;
-  'tab/deactivate': TabStatus;
   'tab/scan': { snapshot: ScanSnapshot; binding: Binding };
   'tab/fill': { report: VerificationReport; snapshot?: ScanSnapshot };
   'tab/cancel': TabStatus;

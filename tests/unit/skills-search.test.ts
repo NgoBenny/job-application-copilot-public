@@ -13,6 +13,7 @@ function widget(options: string[], { delay = 50, stale = false } = {}) {
     const q = (stale ? (first ??= input.value) : input.value).toLowerCase();
     if (!input.value) return;
     setTimeout(() => {
+      if (!input.isConnected) return; // a later test replaced the page
       const ul = document.createElement('ul');
       ul.setAttribute('role', 'listbox');
       const hits = options.filter((o) => o.toLowerCase().includes(q));
@@ -192,7 +193,8 @@ describe('searchSkills', { timeout: 30_000 }, () => {
   });
 
   it('never clicks again when the first click was only slow, so the skill is not toggled off', async () => {
-    const input = toggling((_, toggle) => setTimeout(toggle, 2050));
+    // The first click lands only once the extension has given up waiting and searches again.
+    const input: HTMLInputElement = toggling((n, toggle) => (n === 1 ? input.addEventListener('input', toggle, { once: true }) : toggle()));
     expect(await searchSkills(input, [{ name: 'JavaScript', spellings: ['JavaScript'] }], never)).toEqual([{ name: 'JavaScript', status: 'added', option: 'JavaScript' }]);
     expect(document.querySelectorAll('[data-automation-id="selectedItem"]')).toHaveLength(1);
   });

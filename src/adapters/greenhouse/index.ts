@@ -13,7 +13,6 @@ const fill = fillLifecycle({
 
 export const greenhouse: ApplicationAdapter = {
   id: 'greenhouse',
-  capabilities: new Set(['repeaterAdd']),
   async detect(ctx) {
     return { ok: true, value: detectGreenhouse(ctx.url, ctx.document) };
   },

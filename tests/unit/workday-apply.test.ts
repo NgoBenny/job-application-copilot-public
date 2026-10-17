@@ -402,11 +402,7 @@ describe('skills pop-up in narrow layouts (live 2026-10-17)', () => {
     });
   });
 
-  it('still sees the fields behind the open pop-up', () => {
-    expect(scanWorkday(document, 1).snapshot.fields.find((f) => f.semantic === 'skills')).toBeTruthy();
-  });
-
-  it('types into the pop-up search box and keeps adding skills while it stays open', async () => {
+  it('sees the field behind the open pop-up, types into the pop-up search box and keeps adding skills while it stays open', async () => {
     const fieldId = scanWorkday(document, 1).snapshot.fields.find((f) => f.semantic === 'skills')!.fieldId;
     const r = await workday.searchSkills!(ctx(), { fieldId, items: [{ name: 'Git', spellings: ['Git'] }, { name: 'SQL', spellings: ['SQL'] }] }, new AbortController().signal);
     expect(r.ok && r.value.map((o) => o.status)).toEqual(['added', 'added']);

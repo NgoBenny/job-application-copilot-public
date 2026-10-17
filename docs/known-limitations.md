@@ -1,6 +1,6 @@
 # Known limitations
 
-**Untested on live Workday.** All automated tests use synthetic pages modelled on public Workday markup. Real tenants differ, so treat every result as "check it" until manual QA is recorded in the ledger.
+**Checked live on a handful of sites only.** Automated tests use synthetic pages modelled on public Workday, Greenhouse and Ashby markup; live checks so far are listed in `docs/qa/`. Real employers differ, so treat every result as "check it".
 
 ## Workday variation
 - Detection needs a Workday host plus page markers. Custom domains that front Workday aren't recognized.

@@ -8,7 +8,6 @@ function route(req: Request): Promise<unknown> {
   switch (req.type) {
     case 'tab/status': return tabs.status(req.tabId);
     case 'tab/activate': return tabs.activate(req.tabId, req.applicationId);
-    case 'tab/deactivate': return tabs.deactivate(req.tabId);
     case 'tab/scan': return tabs.scan(req.tabId);
     case 'tab/fill': return tabs.fill(req.tabId, req.plan);
     case 'tab/cancel': return tabs.cancel(req.tabId);
