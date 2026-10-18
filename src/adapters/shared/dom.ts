@@ -56,3 +56,6 @@ export function pressKey(el: Element, key: 'Enter' | 'Escape') {
   const keyCode = key === 'Enter' ? 13 : 27;
   for (const type of ['keydown', 'keyup']) el.dispatchEvent(new KeyboardEvent(type, { key, code: key, keyCode, which: keyCode, bubbles: true, cancelable: true }));
 }
+
+/** Wording of a page that says the application went through (Workday; Ashby's "Your application was successfully submitted", live 2026-10-17). */
+export const SUBMITTED = /\b(application (has been |was )?(successfully )?submitted|thank(s| you) for (applying|your application)|we('ve| have) received your application)\b/i;

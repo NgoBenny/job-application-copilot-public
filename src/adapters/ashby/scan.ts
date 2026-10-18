@@ -1,6 +1,10 @@
 // Read-only inventory of an Ashby application form (jobs.ashbyhq.com). One page; every question is a field-entry block.
 import { classifyProtection, UNTOUCHABLE } from '../../domain/policy';
 import type { FieldKind, ScannedField, ScanSnapshot } from '../../platform/adapter';
+import { SUBMITTED } from '../shared/dom';
+
+/** After Submit, Ashby swaps the form for a success message on the same page. */
+export const submitted = (doc: Document) => !doc.querySelector('[data-field-path]') && SUBMITTED.test(doc.body?.textContent ?? '');
 
 export type ScanResult = { snapshot: ScanSnapshot; elements: Map<string, Element> };
 
@@ -72,5 +76,5 @@ export function scanAshby(doc: Document, revision: number): ScanResult {
       ...(!label ? { uncertain: true } : {}),
     });
   }
-  return { snapshot: { stepId: 'application', stepLabel: 'Application', revision, fields, errors: [], page: { kind: 'application', sso: [] } }, elements };
+  return { snapshot: { stepId: 'application', stepLabel: 'Application', revision, fields, errors: [], page: { kind: submitted(doc) ? 'confirmation' : 'application', sso: [] } }, elements };
 }

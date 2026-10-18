@@ -179,6 +179,7 @@ Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm
 - [x] Tests first: synthetic Ashby form copying a live jobs.ashbyhq.com structure (Yes/No buttons with aria-pressed, place search with an aria-controls list); detection, scan, fill, contract and e2e tests written and run red (19 failing assertions)
 - [x] Plumbing (`ashby` platform id, registry, e2e host over HTTPS because ashbyhq.com is on Chrome's HSTS list) and adapter (`src/adapters/ashby/`, shared fill loop); "full name" profile value; all green
 - [x] Reviews: location write restores the previous value on failure, ignores a stale list, phone label rule widened, only `/application` pages count
+- [x] Confirmation: the success message that replaces the form after Submit is recognized (live screenshot 2026-10-17); before, the tab lost its activation
 - [ ] Live QA with the user on an Ashby application before claiming compatibility
 
 ### Dead-code and test audit (2026-10-17, user request)

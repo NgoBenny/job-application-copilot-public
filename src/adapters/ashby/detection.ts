@@ -1,4 +1,5 @@
 import type { Detection } from '../../platform/adapter';
+import { submitted } from './scan';
 
 // shortcut: hosted jobs.ashbyhq.com only; Ashby forms embedded on employer sites (iframes) are unsupported, add them when a user's application needs it.
 export const isAshbyHost = (hostname: string) => hostname === 'jobs.ashbyhq.com';
@@ -17,6 +18,7 @@ export function detectAshby(url: URL, doc: Document): Detection {
   if (!key) return { status: 'uncertain', evidence: [...evidence, 'Employer could not be identified from the URL'] };
   // Only the Application tab (/<board>/<job>/application) holds the form; the job description tab never counts.
   const onApplication = url.pathname.split('/').filter(Boolean)[2] === 'application';
+  if (onApplication && submitted(doc)) return { status: 'supported', tenantKey: key, evidence: [...evidence, 'Application submitted message'] };
   if (!onApplication || !doc.querySelector('.ashby-application-form-field-entry')) return { status: 'uncertain', tenantKey: key, evidence: [...evidence, 'No application form on this page'] };
   return { status: 'supported', tenantKey: key, evidence: [...evidence, 'ashby-application-form-field-entry'] };
 }

@@ -1,5 +1,6 @@
 // What kind of Workday page this is, from visible, non-secret evidence only. Unknown when unsure.
 import type { PageKind } from '../../platform/adapter';
+import { SUBMITTED } from '../shared/dom';
 
 // Text nodes joined with spaces (textContent glues "Sign In" + "Sign in with Google" into "Sign InSign in…");
 // still not innerText, so no forced layout in the employer's page on every change.
@@ -24,7 +25,7 @@ export function pageKind(doc: Document): { kind: PageKind; sso: string[] } {
   const fields = doc.querySelectorAll('input:not([type="hidden"]):not([type="password"]), select, textarea').length;
 
   // Confirmation: strong wording and no form left to fill.
-  if (fields === 0 && password === 0 && /\b(application (has been |was )?submitted|thank you for (applying|your application)|we('ve| have) received your application)\b/i.test(t)) return { kind: 'confirmation', sso };
+  if (fields === 0 && password === 0 && SUBMITTED.test(t)) return { kind: 'confirmation', sso };
   if (/\b(verify|confirm) your (email|account)\b|verification (email|link) (has been )?sent/i.test(t) && password === 0) return { kind: 'verifyEmail', sso };
   if (password >= 2 || has(doc, ['createAccountSubmitButton', 'createAccountCheckbox'])) return { kind: 'createAccount', sso };
   if (password === 1 || has(doc, ['signInSubmitButton', 'signInContent'])) return { kind: 'signIn', sso };

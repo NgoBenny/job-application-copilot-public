@@ -20,6 +20,16 @@ describe('ashby detection', () => {
     expect(detectAshby(new URL('https://jobs.ashbyhq.com/acme/0f1e2d3c-0000-4000-8000-000000000001'), document).status).toBe('uncertain'); // description tab
     expect(detectAshby(new URL('https://ashbyhq.example.com/acme/1/application'), document).status).toBe('unsupported');
   });
+  it('recognizes the success message that replaces the form after Submit (live 2026-10-17)', () => {
+    document.body.innerHTML = '<main><h1>Engineer - Intern</h1><div role="alert"><p>Success</p><p>Your application was successfully submitted. We’ll contact you if there are next steps.</p></div></main>';
+    expect(detectAshby(APPLY, document)).toMatchObject({ status: 'supported', tenantKey: 'https://jobs.ashbyhq.com/acme' });
+    expect(scanAshby(document, 1).snapshot).toMatchObject({ fields: [], page: { kind: 'confirmation' } });
+    // The same wording on the description tab, or next to a form still to fill, is not a confirmation.
+    expect(detectAshby(new URL('https://jobs.ashbyhq.com/acme/0f1e2d3c-0000-4000-8000-000000000001'), document).status).toBe('uncertain');
+    document.documentElement.innerHTML = HTML;
+    document.body.insertAdjacentHTML('afterbegin', '<p>Your application was successfully submitted.</p>');
+    expect(scanAshby(document, 1).snapshot.page?.kind).toBe('application');
+  });
 });
 
 describe('ashby scan (live structure 2026-10-16)', () => {
