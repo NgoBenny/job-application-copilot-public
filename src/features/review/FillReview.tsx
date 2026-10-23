@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { send, type PlanInput } from '../../browser/messages';
 import { propose, type AnswerSources, type Proposal } from '../../domain/plan';
 import { questionKey, type Scope } from '../../domain/questions';
-import type { MasterProfile } from '../../domain/schemas';
+import type { ApplicationContent, MasterProfile } from '../../domain/schemas';
 import type { Binding, Outcome, ScannedField, ScanSnapshot } from '../../platform/adapter';
 import { Badge, Button, CARD } from '../../ui/fields';
 
@@ -16,8 +16,8 @@ type Result = { actionId: string; label: string; outcome: Outcome; reason: strin
 // A search box counts only with one chosen value: several chips are not one answer.
 const rememberable = (f: ScannedField) => !f.protection && !f.uncertain && !f.semantic && !f.recordKey && !!f.value && (['text', 'textarea', 'select', 'radio', 'dropdown', 'date'].includes(f.kind) || (f.kind === 'multiselect' && !f.value.includes('; ')));
 
-export function FillReview({ snapshot, profile, binding, tabId, answers, onScanned, onRemember, onUseOption }: {
-  snapshot: ScanSnapshot; profile: MasterProfile; binding: Binding; tabId: number; answers: AnswerSources;
+export function FillReview({ snapshot, profile, content, binding, tabId, answers, onScanned, onRemember, onUseOption }: {
+  snapshot: ScanSnapshot; profile: MasterProfile; content?: ApplicationContent; binding: Binding; tabId: number; answers: AnswerSources;
   onScanned: (s: ScanSnapshot) => void; onRemember: (f: ScannedField, scope: Scope) => Promise<void>;
   /** Saves a search-box choice for a profile value, so later proposals offer it directly. */
   onUseOption: (field: string, value: string, option: string) => Promise<void>;
@@ -27,7 +27,7 @@ export function FillReview({ snapshot, profile, binding, tabId, answers, onScann
   const [results, setResults] = useState<Result[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const { proposals, records, notes } = propose(snapshot, profile, manual, answers);
+  const { proposals, records, notes } = propose(snapshot, profile, manual, answers, content);
   const [scopes, setScopes] = useState<Record<string, Scope>>({});
   // An approval covers the exact values shown; if a rescan changes them, the approval no longer applies.
   const approvalKey = (p: Proposal) => `${p.actionId}|${p.current}|${p.proposed}`;
@@ -60,8 +60,8 @@ export function FillReview({ snapshot, profile, binding, tabId, answers, onScann
   }
   const recordLabel = (key: string) => records.find((r) => r.recordKey === key)?.label ?? key;
   const masters = (kind: 'employment' | 'education') => kind === 'employment'
-    ? profile.employment.map((e) => ({ id: e.id, label: [e.title, e.employer].filter(Boolean).join(' at ') }))
-    : profile.education.map((e) => ({ id: e.id, label: e.school }));
+    ? profile.employment.filter((e) => !content || (content.approved && content.employment.some((r) => r.masterId === e.id))).map((e) => ({ id: e.id, label: [e.title, e.employer].filter(Boolean).join(' at ') }))
+    : profile.education.filter((e) => !content || (content.approved && content.educationIds.includes(e.id))).map((e) => ({ id: e.id, label: e.school }));
 
   // A search box already showing a different wording ("Computer and Information Science"): keeping it remembers it as yours for this value.
   const keeper = (p: Proposal) => {
@@ -139,7 +139,7 @@ export function FillReview({ snapshot, profile, binding, tabId, answers, onScann
       )}
 
       {notes.length > 0 && (
-        <ul aria-label="Saved answers not used" className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+        <ul aria-label="Review notes" className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
           {notes.map((n) => <li key={n.label}><span className="font-medium">{n.label}</span>: {n.reason}</li>)}
         </ul>
       )}

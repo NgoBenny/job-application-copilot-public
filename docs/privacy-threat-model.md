@@ -1,8 +1,8 @@
-# Privacy & threat model (final, v0.1.0)
+# Privacy & threat model (review candidate, 2026-10-22)
 
 ## Assets
 - Master profile: contact details, education, employment, projects, skills.
-- Application records: job details, import snapshots, skill selections, step labels, submission date.
+- Application records: job details, import snapshots, selected master records, approved tailored wording, skill selections, step labels, submission date.
 - Saved answers.
 - **Sensitive answers** (demographic, work authorization, sponsorship, conviction). The user chose to store these (decision 2026-10-10).
 - Employer account list: email and status only.
@@ -23,9 +23,11 @@
 | Adversarial labels steer a write to the wrong field | Label ties are marked uncertain. Semantics apply only to compatible control kinds. Each action re-checks label, entry identity and expected value right before writing. Options come only from the control's own list. | `workday-apply.test.ts`, `workday-fill.spec.ts` (zero wrong-field writes) |
 | Credentials, codes, SSO | Classified before values are read (password type, autocomplete, wording, sign-in/registration sections); values never read. Writes are blocked at the page boundary whatever the plan claims. No credential fields exist in any schema. | `policy.test.ts`, `workday-workflow.spec.ts` |
 | Attestations / terms | Classified `attestation` and never read or written. Forbidden-click guard on agree/submit/next/sign-in/delete. | `workday-apply.test.ts` |
-| Sensitive answers misapplied | Filled only from dashboard-typed values. The label must name exactly one topic with no negation. Never "safe", so every one needs approval. Only a choice whose text exactly equals the saved answer, both when proposing and when writing (near-miss options are refused). The page boundary requires the action's declared category to equal the field's category. Never learned from pages. | `questions.test.ts`, `workday-apply.test.ts`, `workday-answers.spec.ts` |
+| Sensitive answers misapplied | Filled only from dashboard-typed values. The question or otherwise its choices must unambiguously name one topic. Individual approval or explicit group approval is allowed for this personal build (2026-10-22); Approve all safe excludes these answers. Exact-choice and page-boundary category checks remain mandatory. Never learned from pages. | `questions.test.ts`, `workday-apply.test.ts`, `workday-answers.spec.ts` |
+| Imported wording changes verified facts | Imported wording is copied only by explicit click into an application draft. Any edit clears content approval; record fills wait for review. Master identity, dates and descriptions remain unchanged. | `application-content.test.ts`, `application-content.spec.ts` |
+| Concurrent application updates are lost | Editor merges only changed fields and refuses conflicting changes; service-worker revision checks remain mandatory. | `applications.spec.ts` |
 | Unapproved skills | Only verified skills are offered. Only exact matches are picked automatically; broader options need a click; job-description-only skills are never offered. | `skills.test.ts`, `workday-skills.spec.ts` |
-| Malformed, huge or polluted imports | Size caps, rejection of `__proto__`/`constructor`/`prototype`, strict schemas, http(s)-only URLs, unknown versions rejected. Migrations run on a copy, so a failure changes nothing. PDFs: 10 MB, 10 pages, 15 s, no XFA, bundled worker. | `backup.test.ts`, `applications.spec.ts` |
+| Malformed, huge or polluted imports | Backups/validated stores: 12 MB; companion JSON: 500 KB. Forbidden prototype keys, strict stored schemas, safe URLs and version checks remain. Migrations run on a copy. PDFs: 10 MB, 10 pages, 15 s, no XFA, bundled worker. | `backup.test.ts`, `applications.spec.ts` |
 | Prompt-injection text | No LLM anywhere. Imported and page text is treated as data. | `pdf-text.test.ts`, `skills.test.ts` |
 | Over-broad host access | Release permissions are `activeTab`, `scripting`, `storage`, `sidePanel`: no host permissions, no static content scripts. The test-only grants exist only in the e2e build. | `manifest.test.ts` |
 | Data at rest | Unencrypted, as the privacy notice states. Export, delete-one, and wipe-all are available. | Dashboard → Backup & privacy |

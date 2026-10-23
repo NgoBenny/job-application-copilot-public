@@ -65,7 +65,7 @@ export function AnswersPanel({ store, run }: { store: Store; run: (r: StoreReque
       <section aria-labelledby="sensitive-h">
         <h2 id="sensitive-h" className="text-lg font-semibold">Sensitive answers</h2>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Only what you type here is ever used for these questions. Each one is proposed only when the question, or else its choices, clearly names the topic, and only if the site shows a choice with exactly the text you typed (for example "No" or "I am not a protected veteran"). Employers word choices differently, so you can put several wordings on separate lines; each must still match a choice exactly. Every fill needs your OK, one field at a time. Leave a topic blank to always answer it yourself.
+          Only what you type here is ever used for these questions. Each one is proposed only when the question, or else its choices, clearly names the topic, and only if the site shows a choice with exactly the text you typed (for example "No" or "I am not a protected veteran"). Employers word choices differently, so you can put several wordings on separate lines; each must still match a choice exactly. Approve each field or explicitly approve its group. Approve all safe never includes these answers. Leave a topic blank to always answer it yourself.
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {SENSITIVE_TOPICS.map((t) => (

@@ -47,7 +47,7 @@ export const ResumeExtract = z.strictObject({
   links: z.array(SafeUrl).max(20),
   education: z.array(z.strictObject({ masterRecordId: text(64).optional(), school: text(), degree: text(), major: text(), start: PartialDate, end: PartialDate })).max(20),
   experience: z.array(z.strictObject({ masterRecordId: text(64).optional(), employer: text(), title: text(), start: PartialDate, end: PartialDate, current: z.boolean(), bullets: z.array(text(1000)).max(50) })).max(50),
-  projects: z.array(z.strictObject({ name: text(), bullets: z.array(text(1000)).max(50) })).max(50),
+  projects: z.array(z.strictObject({ masterRecordId: text(64).optional(), name: text(), description: text(2000).optional(), bullets: z.array(text(1000)).max(50) })).max(50),
   skills: z.array(z.strictObject({ name: text(100), evidence: text(500) })).max(300),
   job: z.strictObject({ company: text(), title: text(), url: SafeUrl, description: text(20_000) }),
   /** Honest notes about extraction quality and PDF/JSON disagreements. */
@@ -64,7 +64,7 @@ export function fromTailoredJson(j: TailoredResumeJSON): ResumeExtract {
     links: j.links.map((l) => l.url).filter(Boolean),
     education: j.education.map(({ masterRecordId, school, degree, major, start, end }) => ({ masterRecordId, school, degree, major, start, end })),
     experience: j.experience.map(({ masterRecordId, employer, title, start, end, current, bullets }) => ({ masterRecordId, employer, title, start, end, current, bullets })),
-    projects: j.projects.map(({ name, bullets }) => ({ name, bullets })),
+    projects: j.projects.map(({ masterRecordId, name, description, bullets }) => ({ name, bullets, ...(masterRecordId ? { masterRecordId } : {}), ...(description ? { description } : {}) })),
     // A skill the JSON says came only from the job description is relevance, not evidence.
     skills: j.skills.filter((s) => s.source !== 'job').map(({ name, evidence }) => ({ name, evidence })),
     job: { company: j.job.company, title: j.job.title, url: j.job.url, description: j.job.description },

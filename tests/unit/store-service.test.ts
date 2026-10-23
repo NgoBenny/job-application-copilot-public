@@ -59,7 +59,7 @@ describe('store service', () => {
     const { applications: _a, ...v1 } = { ...sampleStore(), schemaVersion: 1 };
     await fakeBrowser.storage.local.set({ store: v1 });
     const r = await handle({ type: 'store/get' });
-    expect(r.ok && r.store).toMatchObject({ schemaVersion: 5, applications: [], skillAliases: [], answers: [], sensitiveAnswers: [], accounts: [] });
+    expect(r.ok && r.store).toMatchObject({ schemaVersion: 6, applications: [], skillAliases: [], answers: [], sensitiveAnswers: [], accounts: [] });
   });
 
   it('drops job descriptions that were not opted in to', async () => {

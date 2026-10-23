@@ -24,6 +24,7 @@ export function parseUntrustedJson(text: string, maxBytes = MAX_IMPORT_BYTES): P
 /** migrations[n] upgrades a version-n document to version n+1. */
 export type Migration = (doc: Record<string, unknown>) => Record<string, unknown>;
 export const migrations: Record<number, Migration> = {
+  5: (d) => d, // content is optional; old applications retain their existing fill behavior
   1: (d) => ({ ...d, applications: [] }),
   3: (d) => ({ ...d, answers: [], sensitiveAnswers: [] }),
   4: (d) => ({ ...d, accounts: [], applications: (d.applications as Record<string, unknown>[]).map((a) => ({ ...a, submittedAt: '', stepsSeen: [] })) }),

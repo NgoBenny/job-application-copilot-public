@@ -11,6 +11,17 @@ describe('parseBackup', () => {
     expect(parseBackup(json(s))).toEqual({ ok: true, value: s });
   });
 
+  it('upgrades a version-5 backup without enabling application tailoring', () => {
+    const now = '2026-10-22T00:00:00.000Z';
+    const app = { id: 'old-app', platformId: 'workday', employerLabel: 'Acme', jobTitle: 'Engineer', jobUrl: '', portalOrigin: 'https://example.test', tenantKey: 'https://example.test/Careers', jobDescription: '', persistJobDescription: false, resumeImportMethod: 'none', reviewed: false, skillSelections: ['TypeScript'], submittedAt: '', stepsSeen: [], createdAt: now, updatedAt: now };
+    const restored = parseBackup(JSON.stringify({ ...sampleStore(), schemaVersion: 5, applications: [app] }));
+    expect(restored.ok && restored.value.schemaVersion).toBe(6);
+    if (restored.ok) {
+      expect(restored.value.applications).toEqual([app]);
+      expect(restored.value.applications[0]!.content).toBeUndefined();
+    }
+  });
+
   it('restores a backup larger than 2 MB as application history grows', () => {
     const s = sampleStore();
     s.answers = Array.from({ length: 400 }, (_, n) => ({ id: `answer-${n}`, question: 'Synthetic question', kind: 'text', answer: 'x'.repeat(5000), options: [], scope: 'global', tenantKey: '', applicationId: '', confirmedAt: '2026-10-22T00:00:00.000Z' }));

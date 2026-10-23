@@ -111,9 +111,19 @@ export function SidePanel() {
           )}
           {store && binding && app && tabId !== undefined && (
             <>
-              <FillReview key={`fill:${snapshot.stepId}:${app.id}`} snapshot={snapshot} profile={store.profile} binding={binding} tabId={tabId} onScanned={setSnapshot} onRemember={remember} onUseOption={useOption}
+              <FillReview key={`fill:${snapshot.stepId}:${app.id}`} snapshot={snapshot} profile={store.profile} content={app.content} binding={binding} tabId={tabId} onScanned={setSnapshot} onRemember={remember} onUseOption={useOption}
                 answers={{ memories: store.answers, sensitive: store.sensitiveAnswers, optionAliases: store.optionAliases, ctx: { tenantKey: binding.tenantKey, applicationId: app.id, employer: app.employerLabel, jobTitle: app.jobTitle } }} />
               <SkillsPanel key={`skills:${snapshot.stepId}:${app.id}`} snapshot={snapshot} store={store} app={app} binding={binding} tabId={tabId} run={run} onScanned={setSnapshot} />
+              {app.content?.approved && app.content.projects.length > 0 && <details className="text-sm">
+                <summary className="cursor-pointer font-semibold">Approved project wording (manual entry)</summary>
+                {app.content.projects.map((p) => {
+                  const master = store.profile.projects.find((m) => m.id === p.masterId);
+                  return master && <div key={p.masterId} className="mt-2 space-y-1">
+                    <h3 className="font-medium">{master.name}</h3>
+                    <p className="whitespace-pre-line break-words">{p.description}</p>
+                  </div>;
+                })}
+              </details>}
             </>
           )}
           {(Object.keys(GROUP_TITLES) as ReviewGroup[]).map((g) => s.groups[g].length > 0 && (

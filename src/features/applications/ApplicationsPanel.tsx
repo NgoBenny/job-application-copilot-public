@@ -5,6 +5,7 @@ import type { ResumeExtract } from '../../domain/resume/extract';
 import { Button, Field, FILE_INPUT, type FieldSpec } from '../../ui/fields';
 import { importResume } from './importResume';
 import { ResumeReview } from './ResumeReview';
+import { ApplicationContentEditor } from './ApplicationContentEditor';
 
 type Run = (r: StoreRequest) => Promise<Response>;
 
@@ -82,6 +83,7 @@ function ApplicationEditor({ app, store, run, onDirty, onDeleted }: { app: Appli
     const x: ResumeExtract = r.value;
     setDraft({
       imported: x, resumeImportMethod: x.source, reviewed: false,
+      ...(draft.content ? { content: { ...draft.content, approved: false } } : {}),
       employerLabel: draft.employerLabel || x.job.company, jobTitle: draft.jobTitle || x.job.title, jobUrl: draft.jobUrl || x.job.url,
     });
     if (!jd && x.job.description) setJd(x.job.description);
@@ -155,6 +157,8 @@ function ApplicationEditor({ app, store, run, onDirty, onDeleted }: { app: Appli
         </div>
         {draft.imported && <div className="mt-4"><ResumeReview extract={draft.imported} profile={store.profile} busy={busy} onAddToMaster={addToMaster} /></div>}
       </section>
+
+      <ApplicationContentEditor content={draft.content} profile={store.profile} imported={draft.imported} onChange={(content) => setDraft({ content })} />
 
       {draft.stepsSeen.length > 0 && (
         <section aria-labelledby="steps-h" className="text-sm">
