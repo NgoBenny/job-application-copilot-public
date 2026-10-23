@@ -11,7 +11,7 @@
 | Greenhouse live evidence | Three recorded hosted boards, 2026-10-12/13 |
 | Ashby live evidence | Recorded application QA 2026-10-16; confirmation follow-up 2026-10-17 |
 | Candidate live QA | Pending fresh user-run checks in `release-candidate.md`; historical QA is not a pass for these changes |
-| Review delivery | Isolated private branch `codex/reliability-and-tailoring`, PR into default `feat/workday-v1`; public checkout unchanged |
+| Review delivery | Private PR #1 into `feat/workday-v1`; user also authorized the same patches on a public review branch targeting `main` for CI |
 | Hosted CI | GitHub Actions did not start the phase-9 job due to an account billing/spending restriction; rerun required after the account restriction is resolved |
 
 The sections below record historical phase outcomes. Later entries and this status table supersede earlier untested/Workday-only statements. Sensitive group approval is accepted for personal use as of 2026-10-22; Approve all safe still excludes it.
@@ -46,6 +46,12 @@ Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm
 - [x] `npm run zip` produced `.output/job-application-copilot-0.1.0-chrome.zip`. ZIP manifest checked: four release permissions, no static hosts/content scripts. SHA-256: `56c398bd9f6bbdad466d673d00dc6ee89f64e97263335836b23872d491b95868`.
 - Hosted CI: phase-9 GitHub run `39899975022` did not start any steps because of an account-level Actions billing/spending restriction. Local gate results above are actual runs; hosted CI must be rerun after the account restriction is resolved.
 - Pending external checks: Claude's PR review and fresh user-run live QA in `docs/release-candidate.md`. No live session, merge, store publication, or public-repo update was performed.
+
+## Public CI mirror (2026-10-22, user follow-up)
+
+- The user authorized pushing these changes to the public repo because private GitHub Actions could not start. Use the existing public checkout and its `origin`, preserving its separate history.
+- The private pre-change commit (`600231a`) and public pre-change commit (`e9e1b40`) have the identical Git tree `f3474e4f8f3119e713630190ca40e1fb47f9036e`. Replay only the two reviewed phase commits and this documentation update onto a public `codex/reliability-and-tailoring` branch, with a PR into `main`.
+- No runtime change in this follow-up. The recorded 468-unit/47-browser local gate applies to the identical code. Public CI results are reported on the public PR; default branches remain unmerged pending review.
 
 ---
 

@@ -1,6 +1,6 @@
 # Review candidate — 2026-10-22
 
-This candidate is for code review and user-run QA. It is not published to a store. The private PR targets `feat/workday-v1` from `codex/reliability-and-tailoring`; the public checkout is unchanged.
+This candidate is for code review and user-run QA. It is not published to a store. Private PR #1 targets `feat/workday-v1` from `codex/reliability-and-tailoring`. The user also authorized the same changes on a public review branch targeting `main`, so public CI can run. Preserve the public repo's separate history; neither PR is merged during review.
 
 ## Automated gate
 

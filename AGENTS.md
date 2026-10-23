@@ -16,7 +16,8 @@ Status: `docs/implementation-progress.md` (update it at every phase gate).
 - No real personal data in the repo, tests, fixtures, screenshots or commit messages. Fabricated people only.
 - Never claim live Workday compatibility without the user's recorded manual results.
 - Git: work on `feat/workday-v1`; after each passing phase gate, commit and `git push` to `origin` (the private GitHub repo, user decision 2026-10-10). Never force-push, never publish to a store, never add other remotes.
-  - Review exception (user request 2026-10-22): reliability/tailoring changes use `codex/reliability-and-tailoring` with a PR into `feat/workday-v1`, because that is the repo's sole default branch. Push passing phases to the PR branch; leave the default branch and public checkout unchanged until review.
+  - Review exception (user request 2026-10-22): reliability/tailoring changes use `codex/reliability-and-tailoring` with a private PR into `feat/workday-v1`, because that is the private repo's default branch. Leave default branches unchanged until review.
+  - CI mirror (user request 2026-10-22): also push the reviewed changes to the existing public checkout's `origin` on `codex/reliability-and-tailoring`, with a PR into `main`, so public CI can run. Replay the selected commits onto public history; never push private history or add another remote.
 
 ## Architecture and module boundaries
 

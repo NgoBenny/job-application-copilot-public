@@ -14,7 +14,7 @@ Read `AGENTS.md`, then the current status at the top of `docs/implementation-pro
 
 - Sensitive answers come only from dashboard entries with unambiguous topics and exact choices. Individual or explicit group approval is accepted for personal use (2026-10-22). Approve all safe excludes them. No learning from pages or inferred answers.
 - Never automate navigation, submission, registration, upload, terms/attestations/signatures, credentials, OTP, CAPTCHA or SSO. Real-page debugging follows the session authorization and limits in `CLAUDE.md`.
-- The user requested a PR for Claude's review. This private repo's default/only original branch is `feat/workday-v1`. Work is isolated on `codex/reliability-and-tailoring`, targeting `feat/workday-v1`. Push passing phases to this branch; do not merge or update the public checkout during review.
+- The user requested a PR for Claude's review. Private PR #1 uses `codex/reliability-and-tailoring`, targeting `feat/workday-v1`. The user then authorized replaying the same changes onto the public checkout's `codex/reliability-and-tailoring` branch, with a PR into `main`, to run public CI. Preserve public history and keep both default branches unmerged during review.
 - No real personal data in fixtures, screenshots, logs, commits or QA records.
 
 ## Review and remaining work
