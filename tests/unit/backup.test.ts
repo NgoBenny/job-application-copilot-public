@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { migrate, parseBackup, parseUntrustedJson } from '../../src/domain/backup';
+import { MAX_IMPORT_BYTES, migrate, parseBackup, parseUntrustedJson, validateStore } from '../../src/domain/backup';
 import { PartialDate, SafeUrl } from '../../src/domain/schemas';
 import { sampleStore } from '../fixtures/data/profile';
 
@@ -11,9 +11,25 @@ describe('parseBackup', () => {
     expect(parseBackup(json(s))).toEqual({ ok: true, value: s });
   });
 
+  it('restores a backup larger than 2 MB as application history grows', () => {
+    const s = sampleStore();
+    s.answers = Array.from({ length: 400 }, (_, n) => ({ id: `answer-${n}`, question: 'Synthetic question', kind: 'text', answer: 'x'.repeat(5000), options: [], scope: 'global', tenantKey: '', applicationId: '', confirmedAt: '2026-10-22T00:00:00.000Z' }));
+    const backup = JSON.stringify(s);
+    expect(new TextEncoder().encode(backup).length).toBeGreaterThan(2_000_000);
+    const restored = parseBackup(backup);
+    expect(restored.ok).toBe(true);
+    if (restored.ok) expect(restored.value.answers).toHaveLength(400);
+  });
+
+  it('refuses stores too large to restore from a compact backup', () => {
+    const s = sampleStore();
+    s.answers = Array.from({ length: 1000 }, (_, n) => ({ id: `answer-${n}`, question: 'q'.repeat(3000), kind: 'text', answer: 'x'.repeat(5000), options: Array(20).fill('o'.repeat(300)) as string[], scope: 'global', tenantKey: '', applicationId: '', confirmedAt: '2026-10-22T00:00:00.000Z' }));
+    expect(validateStore(s)).toMatchObject({ ok: false, error: expect.stringContaining('backup size limit') });
+  });
+
   it.each([
     ['not JSON', '{', 'not valid JSON'],
-    ['oversized', 'x'.repeat(2_000_001), 'larger than'],
+    ['oversized', 'x'.repeat(MAX_IMPORT_BYTES + 1), 'larger than'],
     ['__proto__ key', '{"schemaVersion":1,"__proto__":{"polluted":true}}', 'forbidden key'],
     ['nested constructor key', '{"a":{"constructor":{"prototype":{}}}}', 'forbidden key'],
     ['unknown version', json({ ...sampleStore(), schemaVersion: 99 }), 'Unsupported schema version'],

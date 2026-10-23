@@ -6,6 +6,17 @@
 
 Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e`, then `/code-review` + `ponytail-review`, then commit.
 
+## Phase 9 — Reliability fixes (2026-10-22)
+
+- [x] Application saves merge only edited fields into the latest record. Concurrent edits to the same field are refused with the draft preserved; Reload saved application offers explicit recovery. Portal bindings, skills, step history and submission dates survive unrelated edits.
+- [x] Backups use compact JSON and a bounded 12 MB import/store-validation limit, above Chrome's default 10 MiB local quota. File size is checked before reading; large exports round-trip in a browser regression.
+- [x] Added-record verification compares section record counts before/after the plan; one new record cannot verify two clicks, and ignored clicks or growth in another section fail.
+- [x] User decision: retain group approval of dashboard-entered sensitive answers for personal use. Approve all safe continues to exclude them; category and exact-option checks remain mandatory.
+- [x] Gate: typecheck, lint and release build passed; 457 unit tests and 46 E2E tests passed, one opt-in screenshot test skipped. Unit tests used a workspace-local temp directory; E2E ran outside the Windows sandbox for localhost/browser access.
+- [x] Code review: traced merge conflicts, retention/import validation, all three adapter callers and verification outcomes. Ponytail review: shared verifier fix, existing storage revision guard retained, no dependencies or new abstractions. Mutation check (`>` to `>=` in added-record verification) failed three new tests, then source restored.
+- Review delivery: user requested a PR for Claude. This repo has only the default `feat/workday-v1` branch, so changes are isolated on `codex/reliability-and-tailoring`, targeting `feat/workday-v1`; no direct update of the default branch or public checkout.
+- Remaining: application-specific selections/wording, current status documentation, release candidate package and fresh user-run live QA. Existing unit SSO-marker fixture makes an unnecessary iframe request; disable iframe loading in the next phase.
+
 ---
 
 ## Phase 0 — Foundation ✅

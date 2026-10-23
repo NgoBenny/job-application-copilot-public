@@ -2,6 +2,7 @@ import { fakeBrowser } from 'wxt/testing/fake-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { handle, isTrustedSender } from '../../src/browser/store-service';
 import { sampleStore } from '../fixtures/data/profile';
+import { MAX_IMPORT_BYTES } from '../../src/domain/backup';
 
 (globalThis as { chrome?: unknown }).chrome = fakeBrowser;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,7 +37,7 @@ describe('store service', () => {
   it.each([
     ['malformed', '{oops'],
     ['polluted', '{"schemaVersion":1,"__proto__":{}}'],
-    ['oversized', 'x'.repeat(2_000_001)],
+    ['oversized', 'x'.repeat(MAX_IMPORT_BYTES + 1)],
     ['future version', JSON.stringify({ ...sampleStore(), schemaVersion: 99 })],
   ])('a %s import leaves the store untouched', async (_n, text) => {
     await handle({ type: 'store/save', store: sampleStore() });

@@ -62,6 +62,7 @@ export function ApplicationsPanel({ store, run }: { store: Store; run: Run }) {
 }
 
 function ApplicationEditor({ app, store, run, onDirty, onDeleted }: { app: Application; store: Store; run: Run; onDirty: (d: boolean) => void; onDeleted: () => void }) {
+  const [base, setBase] = useState(app);
   const [draft, setDraftState] = useState(app);
   // The job description lives here while the page is open; it is written only if the user opts in.
   const [jd, setJd] = useState(app.jobDescription);
@@ -96,12 +97,21 @@ function ApplicationEditor({ app, store, run, onDirty, onDeleted }: { app: Appli
   }
 
   async function save() {
-    const next = { ...draft, jobDescription: jd, updatedAt: new Date().toISOString() };
+    // Only edited fields are merged; side-panel history and portal bindings may have changed meanwhile.
+    const changes = Object.entries({ ...draft, jobDescription: jd }).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(base[key as keyof Application]));
+    if (changes.some(([key, value]) => JSON.stringify(app[key as keyof Application]) !== JSON.stringify(base[key as keyof Application]) && JSON.stringify(app[key as keyof Application]) !== JSON.stringify(value))) {
+      setStatus('Not saved: this application changed in another window. Reopen it to review the latest values; your draft is still here.');
+      return;
+    }
+    const next = { ...app, ...Object.fromEntries(changes), updatedAt: new Date().toISOString() };
     const parsed = Application.safeParse(next);
     if (!parsed.success) { setStatus(`Not saved: check ${parsed.error.issues.map((i) => i.path.join('.')).join(', ')}.`); return; }
     if (!store.applications.some((a) => a.id === app.id)) { setStatus('Not saved: this application was deleted in another window.'); return; }
     const r = await run({ type: 'store/save', store: { ...store, applications: store.applications.map((a) => (a.id === app.id ? parsed.data : a)) } });
-    if (r.ok) { onDirty(false); setStatus('Saved.'); } else setStatus(`Not saved: ${r.error}`);
+    if (r.ok) {
+      const saved = r.store.applications.find((a) => a.id === app.id)!;
+      setBase(saved); setDraftState(saved); onDirty(false); setStatus('Saved.');
+    } else setStatus(`Not saved: ${r.error}`);
   }
 
   async function addToMaster(kind: 'education' | 'employment', i: number) {
@@ -162,6 +172,10 @@ function ApplicationEditor({ app, store, run, onDirty, onDeleted }: { app: Appli
 
       <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4 dark:border-slate-700">
         <Button variant="primary" onClick={save}>Save application</Button>
+        <Button onClick={() => {
+          if (!confirm('Discard this draft and load the latest saved application?')) return;
+          setBase(app); setDraftState(app); setJd(app.jobDescription); onDirty(false); setStatus('Latest saved application loaded.');
+        }}>Reload saved application</Button>
         {confirmDelete ? (
           <>
             <Button variant="danger" onClick={async () => { const r = await run({ type: 'store/save', store: { ...store, applications: store.applications.filter((a) => a.id !== app.id) } }); if (r.ok) onDeleted(); else setStatus(r.error); }}>Yes, delete this application</Button>

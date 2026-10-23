@@ -1,4 +1,5 @@
 import { expect, FIXTURES, launchExtension, test } from './extension';
+import { sampleStore } from '../fixtures/data/profile';
 
 test('profile survives a browser restart', async ({ ext }) => {
   const page = await ext.context.newPage();
@@ -38,6 +39,27 @@ test('a malformed backup import changes nothing', async ({ context, extensionId 
   await expect(page.getByText(/Can't import: File contains a forbidden key/)).toBeVisible();
   await page.getByRole('button', { name: 'Master profile' }).click();
   await expect(page.getByLabel('First name')).toHaveValue('Avery');
+});
+
+test('a large exported backup can be imported again', async ({ context, extensionId }) => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/options.html`);
+  const store = sampleStore();
+  store.answers = Array.from({ length: 400 }, (_, n) => ({ id: `answer-${n}`, question: 'Synthetic question', kind: 'text', answer: 'x'.repeat(5000), options: [], scope: 'global', tenantKey: '', applicationId: '', confirmedAt: '2026-10-22T00:00:00.000Z' }));
+  expect(await page.evaluate(async (store) => (await chrome.runtime.sendMessage({ type: 'store/save', store })).ok, store)).toBe(true);
+  await page.getByRole('button', { name: 'Backup & privacy' }).click();
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export backup' }).click();
+  const download = await downloading;
+  const chunks: Buffer[] = [];
+  for await (const chunk of (await download.createReadStream())!) chunks.push(Buffer.from(chunk));
+  const buffer = Buffer.concat(chunks);
+  expect(buffer.byteLength).toBeGreaterThan(2_000_000);
+  await page.getByLabel('Import backup').setInputFiles({ name: 'large.backup.json', mimeType: 'application/json', buffer });
+  await expect(page.getByText(/This backup has/)).toContainText('400 saved answers');
+  await page.getByRole('button', { name: 'Replace my data' }).click();
+  await expect(page.getByRole('status')).toHaveText('Backup imported.');
+  expect(await page.evaluate(async () => (await chrome.runtime.sendMessage({ type: 'store/get' })).store.answers.length)).toBe(400);
 });
 
 test('a content script can neither read storage nor ask the service worker for it', async ({ context, extensionId }) => {
