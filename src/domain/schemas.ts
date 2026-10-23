@@ -65,6 +65,16 @@ export const MasterProfile = z.strictObject({
   skills: z.array(Skill).max(300),
 });
 
+export const ApplicationContent = z.strictObject({
+  approved: z.boolean(),
+  educationIds: z.array(id).max(20).refine((ids) => new Set(ids).size === ids.length, 'Select each record once.'),
+  employment: z.array(z.strictObject({ masterId: id, description: text(20_000) })).max(50)
+    .refine((rows) => new Set(rows.map((r) => r.masterId)).size === rows.length, 'Select each record once.'),
+  projects: z.array(z.strictObject({ masterId: id, description: text(20_000) })).max(50)
+    .refine((rows) => new Set(rows.map((r) => r.masterId)).size === rows.length, 'Select each record once.'),
+});
+export type ApplicationContent = z.infer<typeof ApplicationContent>;
+
 /** One job application: employer/job scope, its own tailored resume and selections. Never changes the master profile. */
 export const Application = z.strictObject({
   id,
@@ -82,6 +92,8 @@ export const Application = z.strictObject({
   /** Immutable snapshot of what was imported. */
   imported: ResumeExtract.optional(),
   reviewed: z.boolean(),
+  /** Absent in older applications: use the whole master profile until the user enables tailoring. */
+  content: ApplicationContent.optional(),
   /** Skills the user approved and the site accepted for this application. */
   skillSelections: z.array(text(100)).max(300),
   /** Set only when the user confirms the application was submitted. */
@@ -128,7 +140,7 @@ export const AccountRecord = z.strictObject({
   updatedAt: z.iso.datetime(),
 });
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 export const Store = z.strictObject({
   schemaVersion: z.literal(SCHEMA_VERSION),

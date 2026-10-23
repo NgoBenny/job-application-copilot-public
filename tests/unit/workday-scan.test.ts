@@ -183,7 +183,7 @@ describe('Google sign-in detection (live QA 2026-10-11)', () => {
     return scanWorkday(document, 1).snapshot.page;
   };
   it.each([
-    ['iframe', '<iframe src="https://accounts.google.com/gsi/button"></iframe>'],
+    ['iframe', '<iframe src="https://accounts.google.com/gsi/button" srcdoc=""></iframe>'],
     ['aria-label', '<button aria-label="Sign in with Google"><svg></svg></button>'],
     ['automation id', '<button data-automation-id="googleSignInButtonV2"><svg></svg></button>'],
     ['text', '<button>Sign in with Google</button>'],

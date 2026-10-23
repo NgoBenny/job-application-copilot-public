@@ -1,7 +1,7 @@
 // Proposal engine: compares a scanned step with the verified profile and proposes field actions.
 // Platform-neutral: works only on ScanSnapshot semantics, never on DOM.
 import type { Provenance, ScannedField, ScanSnapshot } from '../platform/adapter';
-import type { Education, Employment, MasterProfile, OptionAlias } from './schemas';
+import type { ApplicationContent, Education, Employment, MasterProfile, OptionAlias } from './schemas';
 import { degreeKey, matchOption, straightQuotes } from './options';
 import { findAnswer, sensitiveChoice, SENSITIVE_TOPICS, type MemoryContext, type QuestionMemory, type SensitiveAnswer } from './questions';
 import { nameKey, sameName } from './text';
@@ -135,7 +135,7 @@ function recordIdentity(fields: readonly ScannedField[]) {
  * Match page records to master records by identity (employer/school, then title/degree/start), never by position.
  * Records created empty in this session are paired with unmatched master records in profile order, flagged for review.
  */
-export function linkRecords(snapshot: ScanSnapshot, profile: MasterProfile, manual: Record<string, string> = {}): RecordLink[] {
+export function linkRecords(snapshot: ScanSnapshot, profile: MasterProfile, manual: Record<string, string> = {}, content?: ApplicationContent): RecordLink[] {
   const groups = new Map<string, ScannedField[]>();
   for (const f of snapshot.fields) if (f.recordKey && /^(workExperience|education)-/.test(f.recordKey)) groups.set(f.recordKey, [...(groups.get(f.recordKey) ?? []), f]);
   const used = new Set(Object.values(manual));
@@ -161,7 +161,8 @@ export function linkRecords(snapshot: ScanSnapshot, profile: MasterProfile, manu
     }
   }
   for (const e of empties) {
-    const next = (e.recordKey.startsWith('education') ? profile.education : profile.employment).find((m) => !used.has(m.id));
+    const next = (e.recordKey.startsWith('education') ? profile.education : profile.employment).find((m) => !used.has(m.id)
+      && (!content || (content.approved && (e.kind === 'education' ? content.educationIds.includes(m.id) : content.employment.some((r) => r.masterId === m.id)))));
     if (next) { used.add(next.id); e.masterId = next.id; e.reason = 'Empty record paired with a record that was missing from the page. Check it.'; }
   }
   return links;
@@ -195,11 +196,23 @@ function answerProposal(f: ScannedField, src: AnswerSources, notes?: PlanResult[
     safe: m.exact && f.value === '' && (f.kind === 'select' || f.kind === 'radio') };
 }
 
-export function propose(snapshot: ScanSnapshot, profile: MasterProfile, manual: Record<string, string> = {}, answers?: AnswerSources): PlanResult {
-  const records = linkRecords(snapshot, profile, manual);
+export function propose(snapshot: ScanSnapshot, profile: MasterProfile, manual: Record<string, string> = {}, answers?: AnswerSources, content?: ApplicationContent): PlanResult {
+  // Match populated entries against every verified record before excluding unselected records.
+  const records = linkRecords(snapshot, profile, manual, content);
+  if (content) profile = {
+    ...profile,
+    employment: content.approved ? profile.employment.filter((e) => content.employment.some((r) => r.masterId === e.id)) : [],
+    education: content.approved ? profile.education.filter((e) => content.educationIds.includes(e.id)) : [],
+  };
+  for (const r of records) {
+    if (r.masterId && !(r.kind === 'education' ? profile.education : profile.employment).some((m) => m.id === r.masterId)) {
+      r.masterId = undefined; r.reason = 'Not selected for this application, or awaiting content approval. Left unchanged.';
+    }
+  }
   const byKey = new Map(records.map((r) => [r.recordKey, r]));
   const proposals: Proposal[] = [];
   const notes: PlanResult['notes'] = [];
+  if (content && !content.approved) notes.push({ label: 'Application content', reason: 'Review and approve the selected records and wording in the dashboard before filling experience or education.' });
   for (const f of snapshot.fields) {
     const fromAnswers = answers && answerProposal(f, answers, notes);
     if (fromAnswers) { proposals.push(fromAnswers); continue; }
@@ -208,6 +221,7 @@ export function propose(snapshot: ScanSnapshot, profile: MasterProfile, manual: 
     let value: string | undefined;
     let recordId: string | undefined;
     let rationale = '';
+    let provenance: Provenance = 'master';
     let pairedEmpty = false;
     if (group === 'contact' || group === 'links') {
       value = contactValue(profile, f.semantic);
@@ -221,6 +235,11 @@ export function propose(snapshot: ScanSnapshot, profile: MasterProfile, manual: 
       if (!m) continue;
       value = group === 'employment' ? employmentValue(m as Employment, key) : educationValue(m as Education, key);
       rationale = `Matches your record "${'employer' in m ? `${m.title} at ${m.employer}` : m.school}" (${link.reason.toLowerCase()})`;
+      if (group === 'employment' && key === 'description' && content?.approved) {
+        value = content.employment.find((e) => e.masterId === recordId)?.description;
+        provenance = 'approved application';
+        rationale = 'From the wording you reviewed and approved for this application';
+      }
     }
     if (value === undefined || value === '') continue; // never propose clearing a field or inventing a value
     if (f.kind === 'date') value = dateFor(f, value);
@@ -228,17 +247,18 @@ export function propose(snapshot: ScanSnapshot, profile: MasterProfile, manual: 
     const aliases = f.kind === 'multiselect' ? (answers?.optionAliases ?? []).filter((a) => a.field === f.semantic && sameValue(a.value, value!, f.semantic)).map((a) => a.option) : [];
     const from = aliases.length ? value : undefined;
     if (aliases.length) { rationale = `${rationale}; or a choice you kept before for "${value}"`; value = [...new Set([value, ...aliases])].join('\n'); }
-    if (value.split('\n').some((v) => sameValue(f.value ?? '', v, f.semantic))) continue;
+    const acceptedValues = f.kind === 'multiselect' ? value.split('\n') : [value];
+    if (acceptedValues.some((v) => sameValue(f.value ?? '', v, f.semantic))) continue;
     // A choice control already showing the matching option ("United States of America" for "United States") is correct.
     if (CHOICE.includes(f.kind) && f.value && matchOption([f.value], value) === 0) continue;
     const correction = f.value !== '';
     proposals.push({
       actionId: `set:${f.fieldId}`, type: 'set', fieldId: f.fieldId, kind: f.kind, label: f.label, recordKey: f.recordKey, recordId,
       ...(f.recordKey ? { expectedRecord: recordIdentityKey(snapshot.fields, f.recordKey) } : {}),
-      current: f.value, proposed: value, ...(from ? { from } : {}), provenance: 'master',
+      current: f.value, proposed: value, ...(from ? { from } : {}), provenance,
       // A value already on the page has unknown authorship (maybe the parser, maybe you), so changing it needs your approval.
       rationale: correction ? `${rationale}. The page already has a different value; approve only if it's wrong.` : rationale,
-      safe: !correction && !pairedEmpty && f.kind !== 'checkbox' && f.kind !== 'multiselect', // search boxes may only offer similar choices
+      safe: provenance === 'master' && !correction && !pairedEmpty && f.kind !== 'checkbox' && f.kind !== 'multiselect', // search boxes may only offer similar choices
     });
   }
   const linked = new Set(records.map((r) => r.masterId).filter(Boolean));

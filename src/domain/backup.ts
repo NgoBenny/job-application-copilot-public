@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { SCHEMA_VERSION, Store } from './schemas';
 
-export const MAX_IMPORT_BYTES = 2_000_000;
+// Covers Chrome's default 10 MiB local-storage quota, including older formatted exports.
+export const MAX_IMPORT_BYTES = 12_000_000;
 const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 export type Parsed<T> = { ok: true; value: T } | { ok: false; error: string };
@@ -23,6 +24,7 @@ export function parseUntrustedJson(text: string, maxBytes = MAX_IMPORT_BYTES): P
 /** migrations[n] upgrades a version-n document to version n+1. */
 export type Migration = (doc: Record<string, unknown>) => Record<string, unknown>;
 export const migrations: Record<number, Migration> = {
+  5: (d) => d, // content is optional; old applications retain their existing fill behavior
   1: (d) => ({ ...d, applications: [] }),
   3: (d) => ({ ...d, answers: [], sensitiveAnswers: [] }),
   4: (d) => ({ ...d, accounts: [], applications: (d.applications as Record<string, unknown>[]).map((a) => ({ ...a, submittedAt: '', stepsSeen: [] })) }),
@@ -49,7 +51,9 @@ export function migrate(input: unknown, steps: Record<number, Migration> = migra
 
 export function validateStore(doc: unknown): Parsed<Store> {
   const r = Store.safeParse(doc);
-  return r.success ? { ok: true, value: r.data } : { ok: false, error: describeIssues(r.error) };
+  if (!r.success) return { ok: false, error: describeIssues(r.error) };
+  if (new TextEncoder().encode(JSON.stringify(r.data)).length > MAX_IMPORT_BYTES) return { ok: false, error: 'Saved data exceeds the backup size limit. Export a backup and remove unused records.' };
+  return { ok: true, value: r.data };
 }
 
 /** Full pipeline for a backup file the user picked. */

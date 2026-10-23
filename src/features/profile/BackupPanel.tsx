@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { parseBackup } from '../../domain/backup';
+import { MAX_IMPORT_BYTES, parseBackup } from '../../domain/backup';
 import type { Store } from '../../domain/schemas';
 import type { Response, StoreRequest } from '../../browser/messages';
 import { Button, FILE_INPUT } from '../../ui/fields';
@@ -10,7 +10,7 @@ export function BackupPanel({ store, run }: { store?: Store; run: (r: StoreReque
   const [confirmWipe, setConfirmWipe] = useState(false);
 
   function exportBackup() {
-    const url = URL.createObjectURL(new Blob([JSON.stringify(store, null, 2)], { type: 'application/json' }));
+    const url = URL.createObjectURL(new Blob([JSON.stringify(store)], { type: 'application/json' }));
     const a = Object.assign(document.createElement('a'), { href: url, download: `copilot-backup-${new Date().toISOString().slice(0, 10)}.backup.json` });
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -18,6 +18,7 @@ export function BackupPanel({ store, run }: { store?: Store; run: (r: StoreReque
 
   async function pick(file: File | undefined) {
     if (!file) return;
+    if (file.size > MAX_IMPORT_BYTES) { setPending(undefined); setStatus(`Can't import: File is larger than ${MAX_IMPORT_BYTES / 1_000_000} MB. Nothing was changed.`); return; }
     const text = await file.text();
     const r = parseBackup(text);
     if (!r.ok) { setPending(undefined); setStatus(`Can't import: ${r.error} Nothing was changed.`); return; }

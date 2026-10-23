@@ -7,7 +7,7 @@ Status: `docs/implementation-progress.md` (update it at every phase gate).
 ## Hard boundaries (never violate)
 
 - Never click Next or Submit, accept terms/attestations, complete registration, or touch passwords, OTPs, CAPTCHA, cookies or Google SSO.
-- Sensitive questions (demographic, disability, veteran, work authorization, sponsorship, legal history) are filled **only** from answers the user entered in the dashboard's Sensitive answers section (user decision 2026-10-10). Never learned from page values, never inferred, never in "approve all safe": each one needs its own approval, an unambiguous category match (from the question, or from the choices when the question names no topic and the choices name exactly one; user decision 2026-10-12), and an exact visible option match (only a bracketed tag that 2+ options share, like "(United States of America)", is ignored; user decision 2026-10-11); an answer may list several wordings, one per line, which must all land on the same single option (user decision 2026-10-12); anything uncertain stays manual.
+- Sensitive questions (demographic, disability, veteran, work authorization, sponsorship, legal history) are filled **only** from answers the user entered in the dashboard's Sensitive answers section (user decision 2026-10-10). Never learned from page values, never inferred, never in "approve all safe": each needs explicit approval (individual or "Approve all in this group", accepted for personal use on 2026-10-22), an unambiguous category match (from the question, or from the choices when the question names no topic and the choices name exactly one; user decision 2026-10-12), and an exact visible option match (only a bracketed tag that 2+ options share, like "(United States of America)", is ignored; user decision 2026-10-11); an answer may list several wordings, one per line, which must all land on the same single option (user decision 2026-10-12); anything uncertain stays manual.
 - Attestations, e-signatures and terms checkboxes are never ticked by the extension.
 - Never invent skills, experience, dates or any other fact. A job description is relevance, never evidence.
 - No `<all_urls>`, no static host permissions in release builds, no remote code/CDNs, no analytics, no server.
@@ -16,6 +16,8 @@ Status: `docs/implementation-progress.md` (update it at every phase gate).
 - No real personal data in the repo, tests, fixtures, screenshots or commit messages. Fabricated people only.
 - Never claim live Workday compatibility without the user's recorded manual results.
 - Git: work on `feat/workday-v1`; after each passing phase gate, commit and `git push` to `origin` (the private GitHub repo, user decision 2026-10-10). Never force-push, never publish to a store, never add other remotes.
+  - Review exception (user request 2026-10-22): reliability/tailoring changes use `codex/reliability-and-tailoring` with a private PR into `feat/workday-v1`, because that is the private repo's default branch. Leave default branches unchanged until review.
+  - CI mirror (user request 2026-10-22): also push the reviewed changes to the existing public checkout's `origin` on `codex/reliability-and-tailoring`, with a PR into `main`, so public CI can run. Replay the selected commits onto public history; never push private history or add another remote.
 
 ## Architecture and module boundaries
 

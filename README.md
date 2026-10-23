@@ -14,6 +14,8 @@ It runs locally, with no backend, analytics, or AI service. The master profile s
 
 The project is experimental. [Redacted QA notes](docs/qa/) record observed failures and fixes. Automated tests reproduce selected cases on synthetic pages; they are not exhaustive employer compatibility checks. The [implementation ledger](docs/implementation-progress.md) includes historical phase notes, some of which predate the later live QA.
 
+The current review candidate adds application-specific record selection and approved wording, conflict-safe application saves, larger restorable backups, and verified entry additions. Fresh live QA of these changes is pending. See the [candidate checklist](docs/release-candidate.md) and [changelog](CHANGELOG.md).
+
 “Filled and verified” means the page shows the expected value after the write. It cannot confirm a portal's internal store or successful submission. Ashby exposed a case where visible answers had not reached that store; the adapter now spaces out writes, with a regression fixture reproducing the race.
 
 ## Architecture
@@ -36,9 +38,10 @@ The release requests `activeTab`, `scripting`, `storage`, and `sidePanel`, with 
 - Imports your tailored resume as a PDF, a companion JSON from your resume chat, or both. It reads them on your device, flags mismatches, and shows how each differs from your master profile. Your master profile stays the source of truth.
 - Scans each Workday step without changing it, then proposes fills: only fields that differ from your profile, each with its source and reason.
 - Repairs My Experience: matches Workday's parsed entries to your real jobs and schools by identity, never by position. It fixes dates and dropdowns, and adds missing entries only when you approve.
+- Lets you select jobs, schools and projects per application and review its employment/project wording. Enable **Application content**, edit or copy imported wording, verify the selections, and save. Factual names, titles and dates still come from the master profile. Excluded entries already on the page stay untouched. Project wording is available in step review for manual entry.
 - Adds skills only from your verified list. It searches Workday's skills box, picks exact matches, offers close options for your approval, and tells you honestly when a skill isn't available.
 - Remembers answers only when you click Remember, scoped to all employers, one employer or one job. It never reuses an answer for reversed wording.
-- Sensitive answers (demographics, work authorization, sponsorship, conviction) are filled only from answers you type in the dashboard. Each one needs your approval, only when the question clearly names the topic, and only into a choice whose text exactly matches what you typed.
+- Sensitive answers (demographics, work authorization, sponsorship, conviction) are filled only from answers you type in the dashboard. Approve individual fields or explicitly approve their group (accepted for personal use); **Approve all safe** excludes them. The question, or otherwise its choices, must clearly name the topic, and the visible choice must exactly match a saved wording.
 - Helps with accounts: it recognizes sign-in and registration pages and keeps an account list (email and status only), but never types or reads passwords, codes or Google sign-in.
 - Respects your edits: the write path rechecks field identity and current value before applying a proposal, then checks the displayed result after the page rerenders. A stale plan or detected user edit is refused.
 
@@ -79,6 +82,8 @@ The full manual QA checklist is in [docs/manual-testing.md](docs/manual-testing.
 
 Your data is stored only in this Chrome profile (`chrome.storage.local`, restricted to the extension's own pages). Chrome doesn't encrypt it, so anyone with access to your computer account could read it. Export backups and delete data from **Dashboard → Backup & privacy**. Job descriptions are saved only if you tick the box. Details: [docs/privacy-threat-model.md](docs/privacy-threat-model.md).
 
+Backups use compact JSON with a 12 MB import limit; Chrome's local-storage quota still applies. The candidate upgrades stored records to schema 6. Export a backup with your previous build before updating if you need the option to return to it; older schema-5 builds cannot read schema-6 data.
+
 Permissions: `activeTab` (only the tab you activate, until it navigates away), `scripting`, `storage`, `sidePanel`. No access to sites until you click Activate.
 
 ## Development
@@ -95,6 +100,8 @@ npm run typecheck && npm run lint && npm run build && npm test && npm run test:e
 ## Screenshots
 
 These use fabricated data only.
+
+The [application content screenshot](docs/screenshots/application-content.png) shows selected records and approved wording in the review candidate.
 
 | Dashboard | Step review | Proposed changes |
 |---|---|---|

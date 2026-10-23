@@ -24,10 +24,12 @@ function holds(value: string, proposed: string, kind: string, semantic?: string)
   return ['select', 'dropdown', 'combobox', 'radio'].includes(kind) && !!value && matchOption([value], proposed) === 0;
 }
 
+const recordCount = (fields: readonly ScannedField[], section: string) => new Set(fields.filter((f) => f.recordKey?.startsWith(`${section}-`)).map((f) => f.recordKey)).size;
+
 export function fillLifecycle(ops: SiteOps) {
   let revision = 0;
   // The plan being verified; verify() needs the proposed values, which the report doesn't carry.
-  const plans = new Map<string, ApprovedFillPlan>();
+  const plans = new Map<string, { plan: ApprovedFillPlan; start: readonly ScannedField[] }>();
 
   /** Waits until the page has been quiet for 300 ms (rerenders settled), at most 4 s. */
   async function settle(signal: AbortSignal) {
@@ -45,9 +47,9 @@ export function fillLifecycle(ops: SiteOps) {
     },
     async apply(ctx, plan, signal) {
       if (ops.scan(ctx.document, revision).snapshot.stepId !== plan.stepId) return { ok: false, outcome: 'stale', reason: 'The page moved to a different step. Scan again.' };
-      plans.set(plan.planId, plan);
       // Record identities before any write, so this plan's own writes into a record don't count as a change.
       const start = ops.scan(ctx.document, revision).snapshot.fields;
+      plans.set(plan.planId, { plan, start });
       const results: ActionResult[] = [];
       let adds = 0;
       for (const a of plan.actions) {
@@ -89,15 +91,24 @@ export function fillLifecycle(ops: SiteOps) {
       return { ok: true, value: { planId: plan.planId, results } };
     },
     async verify(ctx, report, signal) {
-      const plan = plans.get(report.planId);
+      const saved = plans.get(report.planId);
       plans.delete(report.planId);
-      if (!plan) return { ok: false, outcome: 'failed', reason: 'Unknown plan.' };
+      if (!saved) return { ok: false, outcome: 'failed', reason: 'Unknown plan.' };
+      const { plan, start } = saved;
       await settle(signal);
       const { snapshot } = ops.scan(ctx.document, revision);
+      const verifiedAdds = new Map<string, number>();
       const results = report.results.map((r) => {
         if (r.outcome !== 'attempted') return { ...r, outcome: r.outcome as Outcome };
         const a = plan.actions.find((x) => x.actionId === r.actionId)!;
-        if (a.type === 'addRecord') return { actionId: r.actionId, outcome: 'verified' as const, reason: 'Entry added. Scan again to fill it.' };
+        if (a.type === 'addRecord') {
+          const used = verifiedAdds.get(a.fieldId) ?? 0;
+          if (snapshot.stepId === plan.stepId && recordCount(snapshot.fields, a.fieldId) > recordCount(start, a.fieldId) + used) {
+            verifiedAdds.set(a.fieldId, used + 1);
+            return { actionId: r.actionId, outcome: 'verified' as const, reason: 'Entry added. Scan again to fill it.' };
+          }
+          return { actionId: r.actionId, outcome: 'failed' as const, reason: 'No new entry was found. Check the page and add it by hand.' };
+        }
         const f = snapshot.fields.find((x) => x.fieldId === a.fieldId);
         const value = f?.value ?? '';
         return f && (a.sensitiveCategory ? holdsAnswer(value, a.proposed) || holdsAnswer(untagged(value), a.proposed) : holds(value, a.proposed, f.kind, f.semantic))

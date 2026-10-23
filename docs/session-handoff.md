@@ -1,28 +1,29 @@
-# Session handoff (2026-10-10)
+# Session handoff (2026-10-22)
 
-Read this first in a new Claude Code session, then `AGENTS.md`, `CLAUDE.md` and `docs/implementation-progress.md`.
+Read `AGENTS.md`, then the current status at the top of `docs/implementation-progress.md`. Earlier phase sections are historical; they do not override later user decisions or QA notes. Claude-specific setup is in `CLAUDE.md`.
 
-## Where things stand
-- **Project:** Job Application Copilot, a local-first Chrome MV3 extension (WXT + React + TypeScript + Tailwind + Zod). v1 has a Workday adapter only. Spec: `docs/requirements/`. Approved plan: `docs/plans/claude-code-implementation-plan.md`.
-- **Phases 0–8 are complete**, plus post-release fixes. Branch `feat/workday-v1`, pushed to the private GitHub repo. CI (GitHub Actions) is green.
-- **Repo location:** moved out of OneDrive to `C:\Users\User\dev\job-application-copilot` because OneDrive sync removed and locked files in `node_modules`. The old copy at `C:\Users\User\OneDrive\Documents\ChatGPT\Workday Automation` is obsolete. Delete it only when the user says so.
-- **Tests:** 259 unit tests, 31 E2E (Playwright with synthetic Workday fixtures). Gate: `npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e`.
+## Current implementation
 
-## User decisions (binding)
-1. **Sensitive answers** (demographic, disability, veteran, work authorization, sponsorship, conviction) may be saved and filled, but **only from values the user types in the dashboard**. Each one needs its own approval; the label must clearly name one topic; and the choice text must match the saved answer **exactly**, except that a bracketed tag shared by 2+ options (e.g. "Asian (United States of America)") is ignored (2026-10-11); one-off brackets like "Yes (I will require sponsorship)" never match "Yes". They're never learned from pages and never in "Approve all safe". Attestations, e-signatures and terms checkboxes stay manual.
-2. **Push to GitHub after each change/phase** (overrides the plan's original "never push"). Never force-push, never publish to the Chrome Web Store.
-3. On real Workday pages, Claude in Chrome may **read and write form fields** to debug the extension, once the user says go ahead in that session (2026-10-10; was read-only). Never click Next/Save and Continue/Submit, sign in/register, upload, answer sensitive questions, tick attestations/terms, or touch password/OTP/CAPTCHA/SSO.
+- Local Chrome MV3 extension with Workday, Greenhouse hosted-board and Ashby hosted-application adapters. No backend, AI service, analytics or static host permissions.
+- Phases 0–8 and subsequent platform fixes are implemented. Phase 9 fixes stale application saves, backup round trips and added-record verification. Phase 10 adds application-specific record selections and approved wording, schema 6, current docs and a local review candidate.
+- Master facts stay canonical. Application content is opt-in; edits clear its approval. Approved employment descriptions are proposed with application provenance. Project descriptions remain available for manual entry. Old applications retain their existing whole-profile behavior.
+- Unit/E2E coverage includes synthetic forms; existing user-run live results are in `docs/manual-testing.md` and `docs/qa/`. Fresh live testing of the candidate is pending, not implied by earlier QA.
+- Gate: `npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e`. Actual counts and results are in the ledger, not copied into this handoff.
 
-## Working conventions
-- Session start check (from `CLAUDE.md`): `get_session("self")` should be `claude-opus-5-5` / `medium`, with `ponytail:*` and `agent-skills:*` skills loaded.
-- At each gate run `/code-review`, then `ponytail:ponytail-review`. The plan also adds security-auditor and test-engineer subagents at major releases.
-- Windows notes: Git Bash heredocs mangle `\\` and some quotes. Write edit scripts or files with the Write tool, or use Python scripts saved in the scratchpad. `gh` works from PowerShell.
+## Binding decisions
 
-## What's left
-- **The user's live QA:** load `.output/chrome-mv3` (built in this folder), import the backup exported from the old OneDrive-loaded extension (the new path gives a new extension ID and empty storage), then run `docs/manual-testing.md` on ≥2 real employers without submitting. Record the Chrome version and results in the ledger's "Live QA log". Turn any problems into synthetic fixtures.
-- **Optional:** open a PR from `feat/workday-v1` to `main`. The Chrome DevTools MCP (`--categoryExtensions`) could automate the manual popup/side-panel checks, but only in a separate Chrome profile with fabricated data, never the user's default profile.
+- Sensitive answers come only from dashboard entries with unambiguous topics and exact choices. Individual or explicit group approval is accepted for personal use (2026-10-22). Approve all safe excludes them. No learning from pages or inferred answers.
+- Never automate navigation, submission, registration, upload, terms/attestations/signatures, credentials, OTP, CAPTCHA or SSO. Real-page debugging follows the session authorization and limits in `CLAUDE.md`.
+- The user requested a PR for Claude's review. Private PR #1 uses `codex/reliability-and-tailoring`, targeting `feat/workday-v1`. The user then authorized replaying the same changes onto the public checkout's `codex/reliability-and-tailoring` branch, with a PR into `main`, to run public CI. Preserve public history and keep both default branches unmerged during review.
+- No real personal data in fixtures, screenshots, logs, commits or QA records.
 
-## Handy facts
-- Companion-JSON prompt for the resume chat: `docs/chatgpt-resume-handoff.md`.
-- After a rebuild, the user clicks ↻ on the extension card; data is kept.
-- The full previous transcript was exported to the user's Downloads folder as `session-export-1791697984966.zip`. It contains personal data, so never commit it.
+## Review and remaining work
+
+- Review the private PR, its regression tests, `CHANGELOG.md`, and `docs/release-candidate.md`.
+- Export a backup before loading the candidate into a real Chrome profile. It migrates schema 5 to 6; older builds cannot open schema-6 data. Keep the original backup if rollback is needed.
+- Follow the candidate checklist on real Workday employers and hosted Greenhouse/Ashby forms. Record redacted results and convert failures into fixtures. Do not mark pending checks passed without the user's actual results.
+- Build/load instructions and compatibility limits are in `README.md`; `npm run zip` creates a local package only. No store publication or merge is authorized by the review request.
+
+## Environment
+
+Build outside OneDrive. In the Windows agent sandbox, Vitest may need a workspace-local `TEMP`/`TMP`; Chromium/local fixture tests ran outside that sandbox. Unit iframe page loading is disabled so synthetic SSO markers do not make external requests.

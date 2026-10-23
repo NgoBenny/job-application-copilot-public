@@ -1,10 +1,57 @@
 # Implementation progress (ledger)
 
+## Current status (2026-10-22)
+
+| Area | Current evidence |
+|---|---|
+| Product | Local Chrome extension; Workday, Greenhouse hosted boards and Ashby hosted applications implemented |
+| Reliability | Phase 9 passed: 457 unit tests, 46 browser tests; screenshot capture opt-in |
+| Application tailoring | Phase 10 passed: optional record selections, approved employment/project wording, schema 6; 468 unit tests, 47 browser tests |
+| Workday live evidence | Recorded user sessions in `manual-testing.md` and `qa/`, including employer 9 and narrow-window skills findings |
+| Greenhouse live evidence | Three recorded hosted boards, 2026-10-12/13 |
+| Ashby live evidence | Recorded application QA 2026-10-16; confirmation follow-up 2026-10-17 |
+| Candidate live QA | Pending fresh user-run checks in `release-candidate.md`; historical QA is not a pass for these changes |
+| Review delivery | Private PR #1 into `feat/workday-v1`; user also authorized the same patches on a public review branch targeting `main` for CI |
+| Hosted CI | GitHub Actions did not start the phase-9 job due to an account billing/spending restriction; rerun required after the account restriction is resolved |
+
+The sections below record historical phase outcomes. Later entries and this status table supersede earlier untested/Workday-only statements. Sensitive group approval is accepted for personal use as of 2026-10-22; Approve all safe still excludes it.
+
 **Session setup (verified 2026-10-10):** model `claude-opus-5-5`, effort `medium`; plugins `ponytail@ponytail` 5.1.0 (level full), `agent-skills@addy-agent-skills` 0.6.12.
 **Toolchain:** Node 22.23.3, npm 10.9.9; WXT 0.21.4 (Vite 8.3), React 19.3, Tailwind 4.3, Zod 4.6, Vitest 5.0, Playwright 1.64 (Chromium 156), ESLint 10.12, TypeScript 6.0.3 (TS 7.0 is current, but typescript-eslint 8.71 requires `<6.1`).
 **Branch:** `feat/workday-v1`, pushed to the private GitHub repo after each phase (user decision 2026-10-10).
 
 Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e`, then `/code-review` + `ponytail-review`, then commit.
+
+## Phase 9 — Reliability fixes (2026-10-22)
+
+- [x] Application saves merge only edited fields into the latest record. Concurrent edits to the same field are refused with the draft preserved; Reload saved application offers explicit recovery. Portal bindings, skills, step history and submission dates survive unrelated edits.
+- [x] Backups use compact JSON and a bounded 12 MB import/store-validation limit, above Chrome's default 10 MiB local quota. File size is checked before reading; large exports round-trip in a browser regression.
+- [x] Added-record verification compares section record counts before/after the plan; one new record cannot verify two clicks, and ignored clicks or growth in another section fail.
+- [x] User decision: retain group approval of dashboard-entered sensitive answers for personal use. Approve all safe continues to exclude them; category and exact-option checks remain mandatory.
+- [x] Gate: typecheck, lint and release build passed; 457 unit tests and 46 E2E tests passed, one opt-in screenshot test skipped. Unit tests used a workspace-local temp directory; E2E ran outside the Windows sandbox for localhost/browser access.
+- [x] Code review: traced merge conflicts, retention/import validation, all three adapter callers and verification outcomes. Ponytail review: shared verifier fix, existing storage revision guard retained, no dependencies or new abstractions. Mutation check (`>` to `>=` in added-record verification) failed three new tests, then source restored.
+- Review delivery: user requested a PR for Claude. This repo has only the default `feat/workday-v1` branch, so changes are isolated on `codex/reliability-and-tailoring`, targeting `feat/workday-v1`; no direct update of the default branch or public checkout.
+- Remaining: application-specific selections/wording, current status documentation, release candidate package and fresh user-run live QA. Existing unit SSO-marker fixture makes an unnecessary iframe request; disable iframe loading in the next phase.
+
+## Phase 10 — Application content and review candidate (2026-10-22)
+
+- [x] Optional application content selects verified education/employment/project IDs and stores reviewed wording separately from master facts. Changes to selections/wording or a replacement import clear approval. Experience/education proposals pause until content is approved; existing applications keep whole-profile behavior.
+- [x] Imported job/project wording is offered as a draft and copied only on explicit click. Approved employment wording carries `approved application` provenance and requires step-review approval. Project wording is displayed for manual entry because project-specific controls remain unsupported.
+- [x] Populated entries match against the full master profile before filtering selections. Empty entries pair only with selected records; excluded entries are left unchanged. Ambiguous repeated employer/title and school/degree import matches stay unmatched.
+- [x] Schema 6 migration preserves old application records without enabling tailoring. Project import snapshots retain optional IDs and descriptions. Docs explain backup/rollback limits of older schema-5 builds.
+- [x] Fixed whole-text comparison for multiline descriptions: one matching bullet does not suppress a correction, and a complete matching description is a no-op. Search-box alternatives still accept separate wordings.
+- [x] Refreshed README, handoff, architecture, limitations, threat model, changelog and current QA/status tables. Sensitive group approval is retained and documented per the user's decision. Synthetic iframe markers use `srcdoc`, and unit child-frame navigation is disabled to prevent external SSO requests.
+- [x] Final local gate: typecheck, lint, release build and all 468 unit tests passed. Full browser gate: 47 passed, one opt-in screenshot spec skipped. Focused multiline browser flow passed separately with a fabricated-data screenshot (`docs/screenshots/application-content.png`), visually inspected.
+- [x] Code review: traced schema migration, approval invalidation, current application merges, all planner callers, selected/excluded identities, and old-app fallback. Fixed the same-employer selection and multiline bugs found during review. Ponytail/React review: existing fields/buttons/reconciliation reused, shared narrative editor for jobs/projects, no dependency or generic abstraction added. Approval mutation caught by five tests, then source restored.
+- [x] `npm run zip` produced `.output/job-application-copilot-0.1.0-chrome.zip`. ZIP manifest checked: four release permissions, no static hosts/content scripts. SHA-256: `56c398bd9f6bbdad466d673d00dc6ee89f64e97263335836b23872d491b95868`.
+- Hosted CI: phase-9 GitHub run `39899975022` did not start any steps because of an account-level Actions billing/spending restriction. Local gate results above are actual runs; hosted CI must be rerun after the account restriction is resolved.
+- Pending external checks: Claude's PR review and fresh user-run live QA in `docs/release-candidate.md`. No live session, merge, store publication, or public-repo update was performed.
+
+## Public CI mirror (2026-10-22, user follow-up)
+
+- The user authorized pushing these changes to the public repo because private GitHub Actions could not start. Use the existing public checkout and its `origin`, preserving its separate history.
+- The private pre-change commit (`600231a`) and public pre-change commit (`e9e1b40`) have the identical Git tree `f3474e4f8f3119e713630190ca40e1fb47f9036e`. Replay only the two reviewed phase commits and this documentation update onto a public `codex/reliability-and-tailoring` branch, with a PR into `main`.
+- No runtime change in this follow-up. The recorded 468-unit/47-browser local gate applies to the identical code. Public CI results are reported on the public PR; default branches remain unmerged pending review.
 
 ---
 
@@ -180,7 +227,7 @@ Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm
 - [x] Plumbing (`ashby` platform id, registry, e2e host over HTTPS because ashbyhq.com is on Chrome's HSTS list) and adapter (`src/adapters/ashby/`, shared fill loop); "full name" profile value; all green
 - [x] Reviews: location write restores the previous value on failure, ignores a stale list, phone label rule widened, only `/application` pages count
 - [x] Confirmation: the success message that replaces the form after Submit is recognized (live screenshot 2026-10-17); before, the tab lost its activation
-- [ ] Live QA with the user on an Ashby application before claiming compatibility
+- [x] Recorded user-run application QA: `docs/qa/2026-10-16-ashby-board-1.md`. Fixes have synthetic regressions; fresh validation of the current candidate remains pending.
 
 ### Dead-code and test audit (2026-10-17, user request)
 - [x] Bug: Greenhouse native `<select>` questions were scanned but never filled (no write case) and read back the option value, not its text; test first, fixed
@@ -189,13 +236,18 @@ Gate for every phase: `npm run typecheck && npm run lint && npm run build && npm
 - Kept on purpose: `ALIAS_VERSION` (the versioned alias map is a Phase 5 requirement); write-only stored fields (`Application.skillSelections`, `platformId`, `portalOrigin`, `createdAt`, `updatedAt`, `AccountRecord.updatedAt`) because removing them needs a storage migration for no user benefit
 
 ### Live QA log
-| Date | Chrome | Employer (redacted) | Steps | Result |
-|---|---|---|---|---|
-| — | — | not yet run | — | untested |
+The detailed Workday results, including the recorded Chrome version, are in `docs/manual-testing.md` §5. Platform-specific outcomes and follow-ups are in `docs/qa/`.
 
-### Untested areas (honest list)
-- Real Workday markup on any employer (all automation ids, labels, dropdown/listbox behaviour, skills search gesture, step labels)
-- Real toolbar activation, side panel opening from the popup, `activeTab` revocation behaviour
-- PDF extraction on real tailored resumes (only fabricated PDFs tested)
-- Two-column resume layouts; non-English forms (out of scope for v1)
+| Date | Platform | Recorded scope | Evidence |
+|---|---|---|---|
+| 2026-10-10–15 | Workday | Selected employers, experience/questions/skills, account and confirmation observations | Workday QA notes and manual-testing results |
+| 2026-10-12–13 | Greenhouse | Three hosted boards | Greenhouse QA notes |
+| 2026-10-16–17 | Ashby | Hosted application, EEO survey, form-store timing, confirmation | Ashby board 1 note and recorded confirmation follow-up |
+| Pending | Current candidate | Reliability fixes and application content | `docs/release-candidate.md` |
+
+### Remaining validation and unsupported scope
+- Fresh live results for the current candidate; earlier sessions cover only observed employer configurations.
+- Unobserved employers, custom Workday domains and embedded Greenhouse/Ashby forms.
+- Project-specific form controls (wording is provided for manual entry).
+- Two-column/scanned resume extraction and non-English forms remain unsupported.
 

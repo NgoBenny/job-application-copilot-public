@@ -30,7 +30,8 @@ export function reconcile(extract: ResumeExtract, profile: MasterProfile) {
   const education: RecordMatch<Education>[] = extract.education.map((e, index) => {
     const candidates = profile.education.filter((m) => sameName(m.school, e.school));
     // Several degrees at one school: the degree must also match, otherwise it's ambiguous and left unmatched.
-    const master = profile.education.find((m) => m.id === e.masterRecordId) ?? (candidates.length === 1 ? candidates[0] : candidates.find((m) => nameKey(m.degree) === nameKey(e.degree)));
+    const narrowed = candidates.length === 1 ? candidates : candidates.filter((m) => nameKey(m.degree) === nameKey(e.degree));
+    const master = profile.education.find((m) => m.id === e.masterRecordId) ?? (narrowed.length === 1 ? narrowed[0] : undefined);
     return {
       index, label: e.school || 'Untitled school', master,
       diffs: master ? diff([['Degree', e.degree, master.degree], ['Major', e.major, master.major], ['Start', e.start, master.start], ['End', e.end, master.end]]) : [],
@@ -40,7 +41,8 @@ export function reconcile(extract: ResumeExtract, profile: MasterProfile) {
     const byId = profile.employment.find((m) => m.id === e.masterRecordId);
     const candidates = profile.employment.filter((m) => sameName(m.employer, e.employer));
     // Several jobs at one employer: the title must also match, otherwise it's ambiguous and left unmatched.
-    const master = byId ?? (candidates.length === 1 ? candidates[0] : candidates.find((m) => sameName(m.title, e.title)));
+    const narrowed = candidates.length === 1 ? candidates : candidates.filter((m) => sameName(m.title, e.title));
+    const master = byId ?? (narrowed.length === 1 ? narrowed[0] : undefined);
     return {
       index, label: [e.title, e.employer].filter(Boolean).join(' at ') || 'Untitled job', master,
       diffs: master ? diff([['Title', e.title, master.title], ['Start', e.start, master.start], ['End', e.current ? 'Present' : e.end, master.current ? 'Present' : master.end]]) : [],

@@ -29,6 +29,10 @@ describe('TailoredResumeJSON', () => {
     const projects = [{ name: 'Example Tracker', start: '2026', end: 'Present', technologies: 'Python, SQL', bullets: ['Built a thing'] }];
     expect(fromTailoredJson(TailoredResumeJSON.parse({ ...example, projects })).projects).toEqual([{ name: 'Example Tracker', bullets: ['Built a thing'] }]);
   });
+  it('preserves project wording and explicit identity for application review', () => {
+    const projects = [{ masterRecordId: 'project-1', name: 'Example Tracker', description: 'Verified summary', bullets: ['Built a thing'] }];
+    expect(fromTailoredJson(TailoredResumeJSON.parse({ ...example, projects })).projects).toEqual(projects);
+  });
   it('never imports job-description-only skills as the candidate\'s skills', () => {
     const j = fromTailoredJson(TailoredResumeJSON.parse({ ...example, skills: [{ name: 'Kubernetes', source: 'job' }, { name: 'React' }] }));
     expect(j.skills.map((s) => s.name)).toEqual(['React']);
@@ -79,6 +83,13 @@ describe('reconcile', () => {
   it('leaves ambiguous same-employer jobs unmatched', () => {
     const p = { ...profile, employment: [profile.employment[0]!, { ...profile.employment[0]!, id: 'emp-2', title: 'Robotics Engineer' }] };
     const extract = readResumeLines(['EXPERIENCE', 'Acme Robotics | Product Manager | 2025 - Present'], 'r.pdf');
+    expect(reconcile(extract, p).employment[0]!.master).toBeUndefined();
+  });
+
+  it('leaves repeated jobs with the same employer and title unmatched', () => {
+    const p = { ...profile, employment: [profile.employment[0]!, { ...profile.employment[0]!, id: 'emp-2', start: '2025-06' }] };
+    const extract = json();
+    delete extract.experience[0]!.masterRecordId;
     expect(reconcile(extract, p).employment[0]!.master).toBeUndefined();
   });
 

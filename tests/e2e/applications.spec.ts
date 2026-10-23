@@ -129,3 +129,40 @@ test('an application can be marked as submitted by hand, and saving keeps it (li
   await expect(page.getByRole('status').last()).toHaveText('Submission date cleared.');
   await expect(page.getByRole('button', { name: 'Mark as submitted' })).toBeVisible();
 });
+
+test('saving an open draft preserves updates made by another window', async ({ context, extensionId }) => {
+  const page = await context.newPage();
+  await openApplications(page, extensionId);
+  await newApp(page);
+  await page.getByLabel('Job title', { exact: true }).fill('Local job title');
+  await page.evaluate(async () => {
+    const { store } = await chrome.runtime.sendMessage({ type: 'store/get' });
+    store.applications[0] = { ...store.applications[0], employerLabel: 'Updated employer', tenantKey: 'https://example.test/Careers', portalOrigin: 'https://example.test', skillSelections: ['Python'], stepsSeen: [{ label: 'Experience', at: '2026-10-22T00:00:00.000Z' }], submittedAt: '2026-10-22T00:00:00.000Z' };
+    await chrome.runtime.sendMessage({ type: 'store/save', store });
+  });
+  await expect(page.getByRole('navigation', { name: 'Applications' })).toContainText('Updated employer');
+  await page.getByRole('button', { name: 'Save application', exact: true }).click();
+  await expect(page.getByRole('status').last()).toHaveText('Saved.');
+  const saved = await page.evaluate(async () => (await chrome.runtime.sendMessage({ type: 'store/get' })).store.applications[0]);
+  expect(saved).toMatchObject({ employerLabel: 'Updated employer', jobTitle: 'Local job title', tenantKey: 'https://example.test/Careers', portalOrigin: 'https://example.test', skillSelections: ['Python'], stepsSeen: [{ label: 'Experience' }], submittedAt: '2026-10-22T00:00:00.000Z' });
+});
+
+test('concurrent edits to the same application field require review and preserve the draft', async ({ context, extensionId }) => {
+  const page = await context.newPage();
+  await openApplications(page, extensionId);
+  await newApp(page);
+  await page.getByRole('textbox', { name: 'Employer', exact: true }).fill('Local employer');
+  await page.evaluate(async () => {
+    const { store } = await chrome.runtime.sendMessage({ type: 'store/get' });
+    store.applications[0].employerLabel = 'Other employer';
+    await chrome.runtime.sendMessage({ type: 'store/save', store });
+  });
+  await expect(page.getByRole('navigation', { name: 'Applications' })).toContainText('Other employer');
+  await page.getByRole('button', { name: 'Save application', exact: true }).click();
+  await expect(page.getByRole('status').last()).toContainText('changed in another window');
+  await expect(page.getByRole('textbox', { name: 'Employer', exact: true })).toHaveValue('Local employer');
+  expect(await page.evaluate(async () => (await chrome.runtime.sendMessage({ type: 'store/get' })).store.applications[0].employerLabel)).toBe('Other employer');
+  page.once('dialog', (d) => void d.accept());
+  await page.getByRole('button', { name: 'Reload saved application' }).click();
+  await expect(page.getByRole('textbox', { name: 'Employer', exact: true })).toHaveValue('Other employer');
+});
